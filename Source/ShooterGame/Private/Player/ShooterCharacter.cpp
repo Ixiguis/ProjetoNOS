@@ -44,13 +44,22 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	LastDodgeTime = 0.f;
 
 	Health = 100.f;
+	MaxBoostedHealth = 200.f;
+
 	Armor = 0.f;
 	MaxArmor = 100.f;
-	MaxBoostedHealth = 200;
+
 	SpellChargeStartDecayRate = 0.02f;
 	SpellChargeStartDecayTime = 5.f;
 	LastSpellCooldownTime = 1.f;
 
+	MaxShield = Shield = 100.f;
+	ShieldGainPerDamagePoint = 0.25f;
+	ShieldGainDistanceMin = 300.f;
+	ShieldGainDistanceMax = 2000.f;
+	ShieldGainDistanceMinSquared = ShieldGainDistanceMin * ShieldGainDistanceMin;
+	ShieldGainDistanceMaxSquared = ShieldGainDistanceMax * ShieldGainDistanceMax;
+	
 	WeaponAttachPoint = TEXT("WeaponPoint");
 	WeaponPriority.SetNumUninitialized(0);
 	DefaultInventoryClasses.SetNumUninitialized(0);
@@ -326,39 +335,54 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	{
 		return 0.f;
 	}
+
 	// Modify based on game rules.
 	Damage = Game ? Game->ModifyDamage(Damage, this, EventInstigator) : Damage;
+
+	AShooterCharacter* DamageDealer = nullptr;
 	if (EventInstigator)
 	{
-		AShooterCharacter* ShooterChar = Cast<AShooterCharacter>(EventInstigator->GetPawn());
+		DamageDealer = Cast<AShooterCharacter>(EventInstigator->GetPawn());
 		const bool bEnvironmentalDamage = DamageCauser == NULL;
-		if (ShooterChar && !bEnvironmentalDamage)
+		if (DamageDealer && !bEnvironmentalDamage)
 		{
-			Damage *= ShooterChar->DamageScale;
+			Damage *= DamageDealer->DamageScale;
 		}
 	}
 
-	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	const float TotalDamageDealt = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	LastHitTime = GetWorld()->GetTimeSeconds();
-	if (ActualDamage > 0.f || Health < 1.0f)
+
+	if (DamageDealer != nullptr)
 	{
-		const float ArmorAbsorbedDamage = FMath::Min(ActualDamage * 0.5f, Armor);
-		Armor = FMath::Max(0.f, Armor - ActualDamage);
-		ActualDamage -= ArmorAbsorbedDamage;
-		Health -= ActualDamage;
+		DamageDealer->OnHitAnotherCharacter(TotalDamageDealt, this);
+	}
+
+	if (TotalDamageDealt > 0.f || Health < 1.0f)
+	{
+
+		const float ShieldAbsorbedDamage = FMath::Min(TotalDamageDealt, Shield);
+		Shield = FMath::Max(0.f, Shield - TotalDamageDealt);
+		float DamageRemainingToApply = TotalDamageDealt - ShieldAbsorbedDamage;
+
+		const float ArmorAbsorbedDamage = FMath::Min(DamageRemainingToApply * 0.5f, Armor);
+		Armor = FMath::Max(0.f, Armor - ArmorAbsorbedDamage);
+		DamageRemainingToApply -= ArmorAbsorbedDamage;
+
+		Health -= DamageRemainingToApply;
 
 		if (Health < 1.0f && !bIsDying)
 		{
-			Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+			Die(TotalDamageDealt, DamageEvent, EventInstigator, DamageCauser);
 		}
 		else
 		{
-			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
+			PlayHit(TotalDamageDealt, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
 		}
 
 		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 	}
-	return ActualDamage;
+	return TotalDamageDealt;
 }
 
 
@@ -1974,6 +1998,25 @@ void AShooterCharacter::GetPlayerViewPointBP(FVector& Location, FRotator& Rotati
 	}
 }
 
+void AShooterCharacter::GiveShield(float Amount)
+{
+	Shield = FMath::Min(Shield + Amount, MaxShield);
+}
+
+void AShooterCharacter::OnHitAnotherCharacter_Implementation(float DamageDealt, AShooterCharacter* HitCharacter)
+{
+	if (HitCharacter && HitCharacter != this)
+	{
+		const float DistanceToHitCharacterSquared = FVector::DistSquared(GetActorLocation(), HitCharacter->GetActorLocation());
+		const float ShieldDistanceMultiplier = FMath::GetMappedRangeValueClamped(FVector2D(ShieldGainDistanceMinSquared, ShieldGainDistanceMaxSquared), FVector2D(1.f, 0.f), DistanceToHitCharacterSquared);
+		if (ShieldDistanceMultiplier > 0.f)
+		{
+			GiveShield(DamageDealt * ShieldGainPerDamagePoint * ShieldDistanceMultiplier);
+		}
+	}
+}
+
+
 void AShooterCharacter::PreReplication( IRepChangedPropertyTracker & ChangedPropertyTracker )
 {
 	Super::PreReplication( ChangedPropertyTracker );
@@ -1992,6 +2035,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps( TArray< FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION( AShooterCharacter, Inventory, COND_OwnerOnly );
 	DOREPLIFETIME_CONDITION( AShooterCharacter, SpellCharge, COND_OwnerOnly );
 	DOREPLIFETIME_CONDITION( AShooterCharacter, Armor, COND_OwnerOnly );
+	DOREPLIFETIME_CONDITION( AShooterCharacter, Shield, COND_OwnerOnly );
 	
 	// everyone except local owner: flag change is locally instigated
 	DOREPLIFETIME_CONDITION( AShooterCharacter, bWantsToRun,		COND_SkipOwner );

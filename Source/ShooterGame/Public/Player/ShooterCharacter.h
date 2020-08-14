@@ -444,10 +444,18 @@ public:
 
 	/** Gives armor amount to pawn, up to MaxArmor.
 	* @return the amount of armor that was added. */
-	UFUNCTION(BlueprintCallable, Category = Health)
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Health)
 	float GiveArmor(float Amount);
 
 	float GetMaxArmor() const;
+
+	/** Adds shield, limited to MaxShield */
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Health)
+	void GiveShield(float Amount);
+
+	/** event called when this character hits another character. If overriding, don't forget to call parent function. */
+	UFUNCTION(BlueprintNativeEvent, BlueprintAuthorityOnly, Category = Pawn)
+	void OnHitAnotherCharacter(float DamageDealt, AShooterCharacter* HitCharacter);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Misc
@@ -678,7 +686,22 @@ protected:
 	/** Current health of the Pawn. Its default is also used as Max health. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category=Health)
 	float Health;
-	
+
+	/** current armor amount */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Health)
+	float Armor;
+
+	/** Max boosted health (via health vials, mega health powerup, etc). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float MaxBoostedHealth;
+
+	/** maximum armor amount */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float MaxArmor;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Spells
+
 	/** Current spell charge of the character, goes from 0.0 to 1.0. When at 1.0, the character can perform an Overcast spell. */
 	UPROPERTY(BlueprintReadOnly, Replicated, Category=Spells)
 	float SpellCharge;
@@ -705,18 +728,33 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = Spells)
 	float CurrentSpellCooldownTimeNormalized;
 
-	/** current armor amount */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category=Health)
-	float Armor;
+	//////////////////////////////////////////////////////////////////////////
+	// Shield
 
-	/** Max boosted health (via health vials, mega health powerup, etc). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
-	float MaxBoostedHealth;
+	/** Current shield level. Shield absorbs 100% of damage. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = Health)
+	float Shield;
 
-	/** maximum armor amount */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
-	float MaxArmor;
+	/** Max shield level. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float MaxShield;
+
+	/** How much Shield is gained when dealing damage, if distance to damaged pawn is <= ShieldGainDistanceMin. 
+	*	Between ShieldGainDistanceMin and ShieldGainDistanceMax it is interpolated. Beyond ShieldGainDistanceMax it is 0. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float ShieldGainPerDamagePoint;
 	
+	/** If distance to damaged pawn is <= to this much, gains max amount of shield, according to ShieldGainPerDamagePoint. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float ShieldGainDistanceMin;
+	float ShieldGainDistanceMinSquared;
+
+	/** If distance to damaged pawn is > to ShieldGainDistanceMin, gains an interpolated amount of shield up to ShieldGainDistanceMax.
+	*	Beyond ShieldGainDistanceMax, no shield is gained. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float ShieldGainDistanceMax;	
+	float ShieldGainDistanceMaxSquared;
+
 public:
 
 	/** Take damage, handle death */
