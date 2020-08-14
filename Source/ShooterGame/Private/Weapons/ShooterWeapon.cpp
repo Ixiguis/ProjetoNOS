@@ -1381,7 +1381,7 @@ void AShooterWeapon::OnRep_HitNotify()
 	}
 	else if (FiringMode[CurrentFireMode] == FM_Instant || FiringMode[CurrentFireMode] == FM_Beam || FiringMode[CurrentFireMode] == FM_Charge)
 	{
-		if (IsLocallyControlled() && GetGameState()->bClientSideHitVerification)
+		if (IsLocallyControlled() && GetGameState() && GetGameState()->bClientSideHitVerification)
 		{
 			//do not play effects if is local player and ClientSideHitVerification=true, as local player will have processed instant hit and effects already
 			return;

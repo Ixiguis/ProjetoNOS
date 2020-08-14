@@ -19,7 +19,7 @@ bool AShooterPickup_Armor::CanBePickedUp(class AShooterCharacter* TestPawn)
 
 	bool CanPickup = false;
 
-	if (ArmorAmount > 0 && TestPawn->Armor < TestPawn->GetMaxArmor() )
+	if (ArmorAmount > 0 && TestPawn->GetArmor() < TestPawn->GetMaxArmor() )
 	{
 		CanPickup = true;
 	}

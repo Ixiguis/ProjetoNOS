@@ -10,35 +10,12 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBindableEvent_CharacterFired, AShooterWeapon*, Weapon, uint8, FireMode);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBindableEvent_EquippedWeapon, AShooterWeapon*, WeaponEquipped);
 
-UENUM()
-namespace ECharacterAnimations
-{
-	enum Type
-	{
-		Kick,
-	};
-}
-
-USTRUCT()
-struct FAnimRep
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
-	uint32 bForceUpdate : 1;
-
-	UPROPERTY()
-	TEnumAsByte<ECharacterAnimations::Type> AnimToPlay;
-};
-
 UCLASS(Abstract)
 class AShooterCharacter : public ACharacter
 {
 	GENERATED_UCLASS_BODY()
 
 public:
-
-	//virtual void PostInitializeComponents() override;
 
 	/** setup initial variables, spawn inventory */
 	virtual void BeginPlay() override;
@@ -148,7 +125,7 @@ public:
 	 * Find in inventory
 	 * @param WeaponClass	Class of weapon to find.
 	 */
-	UFUNCTION(BlueprintCallable, Category=Weapon)
+	UFUNCTION(BlueprintCallable, Category=Inventory)
 	class AShooterWeapon* FindWeapon(TSubclassOf<class AShooterWeapon> WeaponClass) const;
 	
 	/** Notify sent from the weapon that it has no more ammo to shoot */
@@ -197,9 +174,6 @@ public:
 
 	/** check if pawn can fire weapon */
 	bool CanFire() const;
-
-	/** [server + local] change targeting state */
-	void SetTargeting(bool bNewTargeting);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Movement
@@ -275,12 +249,6 @@ public:
 	/** player released start fire action */
 	void OnStopFireSecondary();
 
-	/** player pressed targeting action */
-	void OnStartTargeting();
-
-	/** player released targeting action */
-	void OnStopTargeting();
-
 	/** player pressed reload action */
 	void OnReload();
 
@@ -335,15 +303,6 @@ public:
 
 	void SwitchToWeaponCategory6();
 	
-	uint32 bKicking : 1;
-
-	float LastKickTime;
-
-	void OnKick();
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerKick();
-	
 	/** returns the best weapon (as defined by WeaponPriority) that has ammo and
 	  * has AIWeaponRange >= AIMinWeaponRangeSquared */
 	UFUNCTION()
@@ -368,11 +327,11 @@ public:
 	USkeletalMeshComponent* GetPawnMesh3P() const;
 	
 	/** get currently equipped weapon */
-	UFUNCTION(BlueprintCallable, Category="Inventory")
+	UFUNCTION(BlueprintPure, Category="Inventory")
 	class AShooterWeapon* GetWeapon() const;
 
 	/** returns all AShooterWeapons in Inventory */
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UFUNCTION(BlueprintPure, Category = "Inventory")
 	TArray<class AShooterWeapon*> GetAllWeapons() const;
 
 	/** get weapon attach point */
@@ -382,6 +341,7 @@ public:
 	int32 GetInventoryCount() const;
 	
 	/** get current ammo for weapon. If GetInventoryAmmo = true, returns ammo amount in inventory, rather than current ammo in clip (if applicable). */
+	UFUNCTION(BlueprintPure, Category="Inventory")
     int32 GetCurrentAmmo(TSubclassOf<AShooterWeapon> WeaponClass, bool GetInventoryAmmo = false) const;
 	
 	/** consume ammo for weapon (only reduces ammo in the AShooterItem_Ammo item, doesn't changes Weapon.CurrentAmmoInClip) */
@@ -393,10 +353,6 @@ public:
 	 * @param Index Inventory index
 	 */
 	class AShooterWeapon* GetInventoryWeapon(int32 index) const;
-
-	/** get targeting state */
-	UFUNCTION(BlueprintCallable, Category="Game|Weapon")
-	bool IsTargeting() const;
 
 	/** get firing state */
 	UFUNCTION(BlueprintCallable, Category="Game|Weapon")
@@ -434,37 +390,68 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Mesh)
 	virtual bool IsFirstPerson() const;
 	
-	/** Returns true if Mana >= ManaRequired. */
-	UFUNCTION(BlueprintCallable, Category=Spells)
-	bool HasEnoughMana(float ManaRequired) const;
-	
-	/** Consumes the specified amount of mana. */
-	UFUNCTION(BlueprintCallable, Category=Spells, BlueprintAuthorityOnly)
-	void UseMana(float Amount);
 
-	/** Restores the given amount of Mana, limited to MaxMana. */
-	UFUNCTION(BlueprintCallable, Category=Spells, BlueprintAuthorityOnly)
-	void RestoreMana(float Amount);
+	//////////////////////////////////////////////////////////////////////////
+	// Spells
+
+	/** Triggers a spell cooldown, and spend all SpellCharge if bUseOvercast == true and SpellCharge == 1.0.
+	*	Make sure to call this both on server and on local client. */
+	UFUNCTION(BlueprintCallable, Category=Spells)
+	void CastSpell(float CooldownTime, bool bUseOvercast);
+
+	/** Adds spell charge, it goes from 0.0 to 1.0. 
+	*	Make sure to call this both on server and on local client. */
+	UFUNCTION(BlueprintCallable, Category=Spells)
+	void AddSpellCharge(float Amount);
 	
-	/** get max mana */
-	UFUNCTION(BlueprintCallable, Category=Health)
-	float GetMaxMana() const;
-	
-	/** get current mana amount */
-	UFUNCTION(BlueprintCallable, Category=Health)
-	float GetMana() const;
+	/** returns true if no spell is on cooldown */
+	UFUNCTION(BlueprintPure, Category=Spells)
+	bool CanCastSpell() const;
+
+	/** returns true if no spell is on cooldown and SpellCharge == 1.0 */
+	UFUNCTION(BlueprintPure, Category = Spells)
+	bool CanCastOvercastSpell() const;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Health and armor
 
 	/** get max health (non-boosted) */
-	UFUNCTION(BlueprintCallable, Category=Health)
+	UFUNCTION(BlueprintPure, Category=Health)
 	float GetMaxHealth() const;
 
+	/** get max health (boosted) */
+	UFUNCTION(BlueprintPure, Category = Health)
+	float GetMaxBoostedHealth() const;
+
+	/** get current health */
+	UFUNCTION(BlueprintPure, Category = Health)
+	float GetHealth() const;
+
+	/** Adds health, limited to MaxHealth or MaxHealthBoosted, and returns how much health was added */
+	UFUNCTION(BlueprintCallable, Category = Health)
+	float GiveHealth(float Amount, bool bIsHealthBoost);
+
 	/** check if pawn is still alive */
-	UFUNCTION(BlueprintCallable, Category=Health)
+	UFUNCTION(BlueprintPure, Category=Health)
 	bool IsAlive() const;
+
+	/** get current armor */
+	UFUNCTION(BlueprintPure, Category = Health)
+	float GetArmor() const;
 
 	/** returns percentage of health when low health effects should start */
 	float GetLowHealthPercentage() const;
-	
+
+	/** Gives armor amount to pawn, up to MaxArmor.
+	* @return the amount of armor that was added. */
+	UFUNCTION(BlueprintCallable, Category = Health)
+	float GiveArmor(float Amount);
+
+	float GetMaxArmor() const;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Misc
+
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	UShooterCharacterMovement* GetShooterCharacterMovement() const;
 
@@ -553,10 +540,6 @@ protected:
 	/** Time at which point the last take hit info for the actor times out and won't be replicated; Used to stop join-in-progress effects all over the screen */
 	float LastTakeHitTimeTimeout;
 
-	/** current targeting state */
-	UPROPERTY(Transient, Replicated)
-	uint8 bIsTargeting : 1;
-
 	/** current running state */
 	UPROPERTY(Transient, Replicated)
 	uint8 bWantsToRun : 1;
@@ -589,10 +572,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category=Pawn)
 	USoundCue* DeathSound;
 	
-	/** animation played on kick */
-	UPROPERTY(EditDefaultsOnly, Category=Animation)
-	UAnimMontage* KickAnim;
-
 	/** effect played on respawn */
 	UPROPERTY(EditDefaultsOnly, Category=Pawn)
 	UParticleSystem* RespawnFX;
@@ -613,10 +592,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category=Pawn)
 	USoundCue* RunStopSound;
 
-	/** sound played when targeting state changes */
-	UPROPERTY(EditDefaultsOnly, Category=Pawn)
-	USoundCue* TargetingSound;
-	
 	/** used to manipulate with run loop sound */
 	UPROPERTY()
 	UAudioComponent* RunLoopAC;
@@ -691,7 +666,7 @@ protected:
 	/** time when this character last took damage */
 	float LastHitTime;
 
-public:
+protected:
 	
 	//////////////////////////////////////////////////////////////////////////
 	// Damage & death
@@ -704,14 +679,32 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category=Health)
 	float Health;
 	
-	/** Current mana of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category=Spells)
-	float Mana;
+	/** Current spell charge of the character, goes from 0.0 to 1.0. When at 1.0, the character can perform an Overcast spell. */
+	UPROPERTY(BlueprintReadOnly, Replicated, Category=Spells)
+	float SpellCharge;
 
-	/** Max mana of the Pawn. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category=Spells)
-	float MaxMana;
-	
+	/** SpellCharge starts to decay after this many seconds. */
+	UPROPERTY(EditDefaultsOnly, Category = Spells)
+	float SpellChargeStartDecayTime;
+
+	/** SpellCharge decays at this rate per second, after DecayTime was reached. */
+	UPROPERTY(EditDefaultsOnly, Category = Spells)
+	float SpellChargeStartDecayRate;
+
+	/** when Charge was last gained */
+	float LastSpellChargeGainTime;
+
+	/** how many seconds is the cooldown of the last spell cast */
+	float LastSpellCooldownTime;
+
+	/** current spell cooldown */
+	UPROPERTY(BlueprintReadOnly, Category = Spells)
+	float CurrentSpellCooldownTime;
+
+	/** current spell cooldown, normalized from 0 to 1 according to last spell's cooldown time */
+	UPROPERTY(BlueprintReadOnly, Category = Spells)
+	float CurrentSpellCooldownTimeNormalized;
+
 	/** current armor amount */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category=Health)
 	float Armor;
@@ -720,20 +713,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
 	float MaxBoostedHealth;
 
-protected:
-
 	/** maximum armor amount */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Health)
 	float MaxArmor;
 	
 public:
-
-	/** Gives armor amount to pawn, up to MaxArmor.
-	* @return the amount of armor that was added. */
-	UFUNCTION(BlueprintCallable, Category=Health)
-	float GiveArmor(float Amount);
-
-	float GetMaxArmor() const;
 
 	/** Take damage, handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
@@ -788,11 +772,6 @@ protected:
 	UFUNCTION()
 	void OnRep_LastTakeHitInfo();
 
-	UPROPERTY(Transient, ReplicatedUsing=OnRep_AnimRep)
-	struct FAnimRep AnimReplication;
-
-	UFUNCTION()
-	void OnRep_AnimRep();
 	//////////////////////////////////////////////////////////////////////////
 	// Inventory
 
@@ -813,11 +792,7 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerEquipWeapon(class AShooterWeapon* NewWeapon);
 
-	/** update targeting state */
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSetTargeting(bool bNewTargeting);
-	
-	/** update targeting state */
+	/** update running state */
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetRunning(bool bNewRunning, bool bToggle);
 

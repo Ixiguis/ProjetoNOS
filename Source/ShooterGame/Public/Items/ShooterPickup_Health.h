@@ -21,10 +21,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Pickup)
 	float Health;
 	
-	/** how much mana does it give? */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Pickup)
-	float Mana;
-	
 	/** if true, health restored limit is Pawn->MaxBoostedHealth, rather than GetMaxHealth() */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Pickup)
 	bool BoostHealth;

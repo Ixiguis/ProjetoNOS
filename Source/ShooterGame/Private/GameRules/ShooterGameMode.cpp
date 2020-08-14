@@ -11,7 +11,7 @@ AShooterGameMode::AShooterGameMode(const FObjectInitializer& ObjectInitializer) 
 	static ConstructorHelpers::FClassFinder<APawn> BotPawnOb(TEXT("/Game/Blueprints/Pawns/BotPawn"));
 	BotPawnClass = BotPawnOb.Class;
 
-	static ConstructorHelpers::FClassFinder<APlayerController> PCOb(TEXT("/Game/Blueprints/Pawns/ShooterPlayerController_BP"));
+	static ConstructorHelpers::FClassFinder<APlayerController> PCOb(TEXT("/Game/Blueprints/Game/ShooterPlayerController_BP"));
 	PlayerControllerClass = PCOb.Class;
 	
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnOb(TEXT("/Game/Blueprints/Pawns/PlayerPawn"));

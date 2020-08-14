@@ -36,7 +36,6 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 		GetCharacterMovement()->SetIsReplicated(true);
 	}
 
-	bIsTargeting = false;
 	bWantsToRun = false;
 	LowHealthPercentage = 0.5f;
 	MaxLandedDamageVelocity = 3000.0f;
@@ -48,8 +47,9 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	Armor = 0.f;
 	MaxArmor = 100.f;
 	MaxBoostedHealth = 200;
-	MaxMana = 100.f;
-	Mana = MaxMana;
+	SpellChargeStartDecayRate = 0.02f;
+	SpellChargeStartDecayTime = 5.f;
+	LastSpellCooldownTime = 1.f;
 
 	WeaponAttachPoint = TEXT("WeaponPoint");
 	WeaponPriority.SetNumUninitialized(0);
@@ -64,7 +64,6 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	WallDodgeMomentum = 1024.f;
 	AIControllerClass = AShooterAIController::StaticClass();
 	DeathSound = NULL;
-	bKicking = false;
 	DamageScale = 1.f;
 	AnyPowerupActive = false;
 	HeadBoneNames.Add(FName("b_head"));
@@ -74,11 +73,6 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 }
-
-/*void AShooterCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}*/
 
 void AShooterCharacter::BeginPlay()
 {
@@ -394,7 +388,7 @@ bool AShooterCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent
 
 	//make sure health is 0 or below (won't be in case of environmental death)
 	Health = FMath::Min(Health, 0.f);
-	Mana = 0.f;
+	SpellCharge  = 0.f;
 
 	// if this is an environmental death then refer to the previous killer so that they receive credit (knocked into lava pits, etc)
 	UDamageType const* const DamageType = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : GetDefault<UDamageType>();
@@ -1158,31 +1152,6 @@ bool AShooterCharacter::CanFire() const
 	return IsAlive();
 }
 
-void AShooterCharacter::SetTargeting(bool bNewTargeting)
-{
-	bIsTargeting = bNewTargeting;
-
-	if (TargetingSound)
-	{
-		UGameplayStatics::SpawnSoundAttached(TargetingSound, GetRootComponent());
-	}
-
-	if (GetLocalRole() < ROLE_Authority)
-	{
-		ServerSetTargeting(bNewTargeting);
-	}
-}
-
-bool AShooterCharacter::ServerSetTargeting_Validate(bool bNewTargeting)
-{
-	return true;
-}
-
-void AShooterCharacter::ServerSetTargeting_Implementation(bool bNewTargeting)
-{
-	SetTargeting(bNewTargeting);
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Movement
 
@@ -1296,16 +1265,6 @@ void AShooterCharacter::StopAllAnimMontages()
 	}
 }
 
-void AShooterCharacter::OnRep_AnimRep()
-{
-	switch (AnimReplication.AnimToPlay)
-	{
-	case ECharacterAnimations::Kick:
-		PlayAnimMontage(KickAnim);
-		break;
-	}
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -1320,15 +1279,13 @@ void AShooterCharacter::SetupPlayerInputComponent(class UInputComponent* TheInpu
 	TheInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	TheInputComponent->BindAxis("LookUpRate", this, &AShooterCharacter::LookUpAtRate);
 
-	TheInputComponent->BindAction("StartFire", IE_Pressed, this, &AShooterCharacter::OnStartFirePrimary);
-	TheInputComponent->BindAction("StopFire", IE_Released, this, &AShooterCharacter::OnStopFirePrimary);
-	TheInputComponent->BindAction("StartFire2", IE_Pressed, this, &AShooterCharacter::OnStartFireSecondary);
-	TheInputComponent->BindAction("StopFire2", IE_Released, this, &AShooterCharacter::OnStopFireSecondary);
-	TheInputComponent->BindAction("Kick", IE_Released, this, &AShooterCharacter::OnKick);
-
+	TheInputComponent->BindAction("FirePrimary", IE_Pressed, this, &AShooterCharacter::OnStartFirePrimary);
+	TheInputComponent->BindAction("FirePrimary", IE_Released, this, &AShooterCharacter::OnStopFirePrimary);
+	TheInputComponent->BindAction("FireSecondary", IE_Pressed, this, &AShooterCharacter::OnStartFireSecondary);
+	TheInputComponent->BindAction("FireSecondary", IE_Released, this, &AShooterCharacter::OnStopFireSecondary);
+	
 	TheInputComponent->BindAction("NextWeapon", IE_Pressed, this, &AShooterCharacter::OnNextWeapon);
 	TheInputComponent->BindAction("PrevWeapon", IE_Pressed, this, &AShooterCharacter::OnPrevWeapon);
-	TheInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterCharacter::OnReload);
 	TheInputComponent->BindAction("WeaponCat1", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory1);
 	TheInputComponent->BindAction("WeaponCat2", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory2);
 	TheInputComponent->BindAction("WeaponCat3", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory3);
@@ -1336,12 +1293,10 @@ void AShooterCharacter::SetupPlayerInputComponent(class UInputComponent* TheInpu
 	TheInputComponent->BindAction("WeaponCat5", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory5);
 	TheInputComponent->BindAction("WeaponCat6", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory6);
 
-	TheInputComponent->BindAction("StartJump", IE_Pressed, this, &AShooterCharacter::OnStartJump);
-	TheInputComponent->BindAction("StopJump", IE_Released, this, &AShooterCharacter::OnStopJump);
-	TheInputComponent->BindAction("StartCrouch", IE_Pressed, this, &AShooterCharacter::OnStartCrouchInput);
-	TheInputComponent->BindAction("StopCrouch", IE_Released, this, &AShooterCharacter::OnStopCrouchInput);
-
-	TheInputComponent->BindAction("Use", IE_Pressed, this, &AShooterCharacter::OnUse);
+	TheInputComponent->BindAction("Jump", IE_Pressed, this, &AShooterCharacter::OnStartJump);
+	TheInputComponent->BindAction("Jump", IE_Released, this, &AShooterCharacter::OnStopJump);
+	TheInputComponent->BindAction("Crouch", IE_Pressed, this, &AShooterCharacter::OnStartCrouchInput);
+	TheInputComponent->BindAction("Crouch", IE_Released, this, &AShooterCharacter::OnStopCrouchInput);
 
 	TheInputComponent->BindAction("DodgeForward", IE_DoubleClick, this, &AShooterCharacter::OnDodgeForward);
 	TheInputComponent->BindAction("DodgeBackward", IE_DoubleClick, this, &AShooterCharacter::OnDodgeBackward);
@@ -1429,24 +1384,6 @@ void AShooterCharacter::OnStopFirePrimary()
 void AShooterCharacter::OnStopFireSecondary()
 {
 	StopWeaponFire(1);
-}
-
-void AShooterCharacter::OnStartTargeting()
-{
-	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
-	{
-		if (IsRunning())
-		{
-			SetRunning(false, false);
-		}
-		SetTargeting(true);
-	}
-}
-
-void AShooterCharacter::OnStopTargeting()
-{
-	SetTargeting(false);
 }
 
 void AShooterCharacter::OnReload()
@@ -1565,10 +1502,6 @@ void AShooterCharacter::OnStartRunning()
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
-		if (IsTargeting())
-		{
-			SetTargeting(false);
-		}
 		StopAllWeaponFire();
 		SetRunning(true, false);
 	}
@@ -1579,10 +1512,6 @@ void AShooterCharacter::OnStartRunningToggle()
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
-		if (IsTargeting())
-		{
-			SetTargeting(false);
-		}
 		StopAllWeaponFire();
 		SetRunning(true, true);
 	}
@@ -1674,10 +1603,6 @@ void AShooterCharacter::PlaySoundReplicated_Implementation(USoundCue* Sound)
 	UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
 }
 
-void AShooterCharacter::OnUse()
-{
-}
-
 FHitResult AShooterCharacter::ForwardTrace(float TraceDist, ECollisionChannel TraceChannel) const
 {
 	static FName Tag = FName(TEXT("ForwardTrace"));
@@ -1707,36 +1632,6 @@ FHitResult AShooterCharacter::ForwardTrace(float TraceDist, ECollisionChannel Tr
 	return Hit;
 }
 
-void AShooterCharacter::OnKick()
-{
-	ServerKick();
-}
-
-bool AShooterCharacter::ServerKick_Validate()
-{
-	return true;
-}
-
-void AShooterCharacter::ServerKick_Implementation()
-{
-	if (GetCharacterMovement()->IsCrouching())
-	{
-		return;
-	}
-	
-	const float KickInterval = 1.f;
-	if (GWorld && LastKickTime <= GWorld->GetTimeSeconds() - KickInterval )
-	{
-		AnimReplication.AnimToPlay = ECharacterAnimations::Kick;
-		AnimReplication.bForceUpdate = !AnimReplication.bForceUpdate;
-
-		//play anim locally (also run on DedicatedServer because damage depends on anim notify)
-		OnRep_AnimRep();
-
-		LastKickTime = GWorld->GetTimeSeconds();
-	}
-}
-
 bool AShooterCharacter::IsRunning() const
 {	
 	if (!GetCharacterMovement())
@@ -1750,6 +1645,14 @@ bool AShooterCharacter::IsRunning() const
 void AShooterCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	CurrentSpellCooldownTime = FMath::Max(CurrentSpellCooldownTime - DeltaSeconds, 0.f);
+	CurrentSpellCooldownTimeNormalized = CurrentSpellCooldownTime / LastSpellCooldownTime;
+
+	if (GetWorld()->GetTimeSeconds() - SpellChargeStartDecayTime > LastSpellChargeGainTime)
+	{
+		SpellCharge = FMath::Max(SpellCharge - SpellChargeStartDecayRate * DeltaSeconds, 0.f);
+	}
 
 	if (bWantsToRunToggled && !IsRunning())
 	{
@@ -1876,11 +1779,6 @@ FName AShooterCharacter::GetWeaponAttachPoint() const
 	return WeaponAttachPoint;
 }
 
-bool AShooterCharacter::IsTargeting() const
-{
-	return bIsTargeting;
-}
-
 bool AShooterCharacter::IsFirstPerson() const
 {
 	AShooterPlayerController* SPC = Cast<AShooterPlayerController>(Controller);
@@ -1892,14 +1790,77 @@ bool AShooterCharacter::IsFirstPerson() const
 	return IsLocallyControlled();
 }
 
+void AShooterCharacter::CastSpell(float CooldownTime, bool bUseOvercast)
+{
+	if (CanCastSpell())
+	{
+		if (bUseOvercast && CanCastOvercastSpell())
+		{
+			SpellCharge = 0.f;
+			LastSpellChargeGainTime = GetWorld()->GetTimeSeconds();
+		}
+		LastSpellCooldownTime = CooldownTime;
+		CurrentSpellCooldownTime = CooldownTime;
+	}
+}
+
+void AShooterCharacter::AddSpellCharge(float Amount)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		SpellCharge = FMath::Clamp(SpellCharge+Amount, 0.f, 1.f);
+		LastSpellChargeGainTime = GetWorld()->GetTimeSeconds();
+	}
+}
+
+bool AShooterCharacter::CanCastSpell() const
+{
+	return CurrentSpellCooldownTime == 0.f;
+}
+
+bool AShooterCharacter::CanCastOvercastSpell() const
+{
+	return CanCastSpell() && SpellCharge == 1.f;
+}
+
 float AShooterCharacter::GetMaxHealth() const
 {
 	return GetClass()->GetDefaultObject<AShooterCharacter>()->Health;
 }
 
+float AShooterCharacter::GetMaxBoostedHealth() const
+{
+	return MaxBoostedHealth;
+}
+
+float AShooterCharacter::GetHealth() const
+{
+	return Health;
+}
+
+float AShooterCharacter::GiveHealth(float Amount, bool bIsHealthBoost)
+{
+	float MissingHealth;
+	if (bIsHealthBoost)
+	{
+		MissingHealth = FMath::Min(Amount, MaxBoostedHealth - Health);
+	}
+	else
+	{
+		MissingHealth = FMath::Min(Amount, GetMaxHealth() - Health);
+	}
+	Health = Health + MissingHealth;
+	return MissingHealth;
+}
+
 bool AShooterCharacter::IsAlive() const
 {
 	return Health > 0.f;
+}
+
+float AShooterCharacter::GetArmor() const
+{
+	return Armor;
 }
 
 float AShooterCharacter::GetLowHealthPercentage() const
@@ -2029,48 +1990,14 @@ void AShooterCharacter::GetLifetimeReplicatedProps( TArray< FLifetimeProperty > 
 
 	//owner only
 	DOREPLIFETIME_CONDITION( AShooterCharacter, Inventory, COND_OwnerOnly );
-	DOREPLIFETIME_CONDITION( AShooterCharacter, Mana, COND_OwnerOnly );
-	DOREPLIFETIME_CONDITION( AShooterCharacter, MaxMana, COND_OwnerOnly );
+	DOREPLIFETIME_CONDITION( AShooterCharacter, SpellCharge, COND_OwnerOnly );
 	DOREPLIFETIME_CONDITION( AShooterCharacter, Armor, COND_OwnerOnly );
 	
 	// everyone except local owner: flag change is locally instigated
-	DOREPLIFETIME_CONDITION( AShooterCharacter, bIsTargeting,		COND_SkipOwner );
 	DOREPLIFETIME_CONDITION( AShooterCharacter, bWantsToRun,		COND_SkipOwner );
 	
 	// everyone
 	DOREPLIFETIME( AShooterCharacter, CurrentWeapon );
 	DOREPLIFETIME( AShooterCharacter, Health );
-	DOREPLIFETIME(AShooterCharacter, AnimReplication);
 	DOREPLIFETIME(AShooterCharacter, DamageScale);
-}
-
-bool AShooterCharacter::HasEnoughMana(float ManaRequired) const
-{
-	return Mana >= ManaRequired;
-}
-
-void AShooterCharacter::UseMana(float Amount)
-{
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		Mana = FMath::Max(0.f, Mana - Amount);
-	}
-}
-
-void AShooterCharacter::RestoreMana(float Amount)
-{
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		Mana = FMath::Min(MaxMana, Mana + Amount);
-	}
-}
-
-float AShooterCharacter::GetMaxMana() const
-{
-	return MaxMana;
-}
-
-float AShooterCharacter::GetMana() const
-{
-	return Mana;
 }
