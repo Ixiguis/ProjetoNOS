@@ -708,11 +708,11 @@ protected:
 
 	/** SpellCharge starts to decay after this many seconds. */
 	UPROPERTY(EditDefaultsOnly, Category = Spells)
-	float SpellChargeStartDecayTime;
+	float SpellChargeDecaysAfter;
 
 	/** SpellCharge decays at this rate per second, after DecayTime was reached. */
 	UPROPERTY(EditDefaultsOnly, Category = Spells)
-	float SpellChargeStartDecayRate;
+	float SpellChargeDecayRate;
 
 	/** when Charge was last gained */
 	float LastSpellChargeGainTime;
@@ -754,6 +754,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
 	float ShieldGainDistanceMax;	
 	float ShieldGainDistanceMaxSquared;
+
+	/** After gaining any amount of shield, how long (seconds) it takes to start decaying. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float ShieldDecaysAfter;
+	
+	/** Game time when shield was last gained. */
+	float LastShieldGainTime;
+
+	/** Shield decay rate per second. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health)
+	float ShieldDecayRate;
 
 public:
 

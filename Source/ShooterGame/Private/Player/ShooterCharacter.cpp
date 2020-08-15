@@ -49,16 +49,18 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	Armor = 0.f;
 	MaxArmor = 100.f;
 
-	SpellChargeStartDecayRate = 0.02f;
-	SpellChargeStartDecayTime = 5.f;
+	SpellChargeDecayRate = 0.f;
+	SpellChargeDecaysAfter = 5.f;
 	LastSpellCooldownTime = 1.f;
 
-	MaxShield = Shield = 100.f;
-	ShieldGainPerDamagePoint = 0.25f;
-	ShieldGainDistanceMin = 300.f;
-	ShieldGainDistanceMax = 2000.f;
+	MaxShield = 100.f;
+	ShieldGainPerDamagePoint = 0.5f;
+	ShieldGainDistanceMin = 100.f;
+	ShieldGainDistanceMax = 4000.f;
 	ShieldGainDistanceMinSquared = ShieldGainDistanceMin * ShieldGainDistanceMin;
 	ShieldGainDistanceMaxSquared = ShieldGainDistanceMax * ShieldGainDistanceMax;
+	ShieldDecaysAfter = 5.f;
+	ShieldDecayRate = 10.f;
 	
 	WeaponAttachPoint = TEXT("WeaponPoint");
 	WeaponPriority.SetNumUninitialized(0);
@@ -355,7 +357,7 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 
 	if (DamageDealer != nullptr)
 	{
-		DamageDealer->OnHitAnotherCharacter(TotalDamageDealt, this);
+		DamageDealer->OnHitAnotherCharacter(FMath::Min(TotalDamageDealt, Health+Armor+Shield), this);
 	}
 
 	if (TotalDamageDealt > 0.f || Health < 1.0f)
@@ -369,9 +371,9 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 		Armor = FMath::Max(0.f, Armor - ArmorAbsorbedDamage);
 		DamageRemainingToApply -= ArmorAbsorbedDamage;
 
-		Health -= DamageRemainingToApply;
+		Health = FMath::Max(0.f, Health - DamageRemainingToApply);
 
-		if (Health < 1.0f && !bIsDying)
+		if (Health < 1.0f)
 		{
 			Die(TotalDamageDealt, DamageEvent, EventInstigator, DamageCauser);
 		}
@@ -396,7 +398,6 @@ bool AShooterCharacter::CanDie(float KillingDamage, FDamageEvent const& DamageEv
 	{
 		return false;
 	}
-
 	return true;
 }
 
@@ -408,11 +409,10 @@ bool AShooterCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent
 		return false;
 	}
 
-	ApplyDamageMomentum(KillingDamage, DamageEvent, Killer? Killer->GetPawn() : NULL, DamageCauser);
-
-	//make sure health is 0 or below (won't be in case of environmental death)
-	Health = FMath::Min(Health, 0.f);
-	SpellCharge  = 0.f;
+	Health = 0.f;
+	Armor = 0.f;
+	Shield = 0.f;
+	SpellCharge = 0.f;
 
 	// if this is an environmental death then refer to the previous killer so that they receive credit (knocked into lava pits, etc)
 	UDamageType const* const DamageType = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : GetDefault<UDamageType>();
@@ -1673,9 +1673,16 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	CurrentSpellCooldownTime = FMath::Max(CurrentSpellCooldownTime - DeltaSeconds, 0.f);
 	CurrentSpellCooldownTimeNormalized = CurrentSpellCooldownTime / LastSpellCooldownTime;
 
-	if (GetWorld()->GetTimeSeconds() - SpellChargeStartDecayTime > LastSpellChargeGainTime)
+	if (GetLocalRole() == ROLE_Authority)
 	{
-		SpellCharge = FMath::Max(SpellCharge - SpellChargeStartDecayRate * DeltaSeconds, 0.f);
+		if (ShieldDecayRate > 0.f && GetWorld()->GetTimeSeconds() - ShieldDecaysAfter > LastShieldGainTime)
+		{
+			Shield = FMath::Max(Shield - ShieldDecayRate * DeltaSeconds, 0.f);
+		}
+		if (SpellChargeDecayRate > 0.f && GetWorld()->GetTimeSeconds() - SpellChargeDecaysAfter > LastSpellChargeGainTime)
+		{
+			SpellCharge = FMath::Max(SpellCharge - SpellChargeDecayRate * DeltaSeconds, 0.f);
+		}
 	}
 
 	if (bWantsToRunToggled && !IsRunning())
@@ -2000,15 +2007,20 @@ void AShooterCharacter::GetPlayerViewPointBP(FVector& Location, FRotator& Rotati
 
 void AShooterCharacter::GiveShield(float Amount)
 {
-	Shield = FMath::Min(Shield + Amount, MaxShield);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		Shield = FMath::Min(Shield + Amount, MaxShield);
+		LastShieldGainTime = GetWorld()->GetTimeSeconds();
+	}
 }
 
 void AShooterCharacter::OnHitAnotherCharacter_Implementation(float DamageDealt, AShooterCharacter* HitCharacter)
 {
-	if (HitCharacter && HitCharacter != this)
+	if (GetLocalRole() == ROLE_Authority && DamageDealt > 0.f && ShieldGainPerDamagePoint > 0.f && HitCharacter && HitCharacter != this)
 	{
 		const float DistanceToHitCharacterSquared = FVector::DistSquared(GetActorLocation(), HitCharacter->GetActorLocation());
-		const float ShieldDistanceMultiplier = FMath::GetMappedRangeValueClamped(FVector2D(ShieldGainDistanceMinSquared, ShieldGainDistanceMaxSquared), FVector2D(1.f, 0.f), DistanceToHitCharacterSquared);
+		const float InterpAlpha = FMath::GetMappedRangeValueClamped(FVector2D(ShieldGainDistanceMinSquared, ShieldGainDistanceMaxSquared), FVector2D(1.f, 0.f), DistanceToHitCharacterSquared);
+		const float ShieldDistanceMultiplier = FMath::InterpEaseIn(0.f, 1.f, InterpAlpha, 3.f);
 		if (ShieldDistanceMultiplier > 0.f)
 		{
 			GiveShield(DamageDealt * ShieldGainPerDamagePoint * ShieldDistanceMultiplier);
@@ -2038,7 +2050,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps( TArray< FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION( AShooterCharacter, Shield, COND_OwnerOnly );
 	
 	// everyone except local owner: flag change is locally instigated
-	DOREPLIFETIME_CONDITION( AShooterCharacter, bWantsToRun,		COND_SkipOwner );
+	DOREPLIFETIME_CONDITION( AShooterCharacter, bWantsToRun, COND_SkipOwner );
 	
 	// everyone
 	DOREPLIFETIME( AShooterCharacter, CurrentWeapon );
