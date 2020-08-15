@@ -518,9 +518,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Inventory)
 	FName WeaponAttachPoint;
 
-	/** default inventory list */
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
-	TArray<TSubclassOf<class AShooterWeapon> > DefaultInventoryClasses;
+	/** weapons given at game start */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Inventory)
+	TArray<TSubclassOf<class AShooterWeapon> > StartingWeapons;
 
 	/** weapons in inventory */
 	UPROPERTY(Transient, Replicated)

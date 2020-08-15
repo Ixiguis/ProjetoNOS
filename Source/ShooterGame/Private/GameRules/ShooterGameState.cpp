@@ -22,6 +22,16 @@ void AShooterGameState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	MessageHandlerInst = NewObject<UShooterMessageHandler>(GetTransientPackage(), MessageHandlerClass, TEXT("MsgHandler"), RF_ClassDefaultObject | RF_Transient | RF_Public | RF_MarkAsNative);
+
+	// call GameModeAndStateInitialized on the server player too
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		AShooterPlayerController* ServerPC = GetWorld()->GetFirstPlayerController<AShooterPlayerController>();
+		if (ServerPC && ServerPC->GetNetMode() == NM_ListenServer)
+		{
+			ServerPC->GameModeAndStateInitialized();
+		}
+	}
 }
 
 void AShooterGameState::GetLifetimeReplicatedProps( TArray< FLifetimeProperty > & OutLifetimeProps ) const

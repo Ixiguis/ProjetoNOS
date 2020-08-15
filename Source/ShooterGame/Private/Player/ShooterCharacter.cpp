@@ -59,12 +59,12 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	ShieldGainDistanceMax = 4000.f;
 	ShieldGainDistanceMinSquared = ShieldGainDistanceMin * ShieldGainDistanceMin;
 	ShieldGainDistanceMaxSquared = ShieldGainDistanceMax * ShieldGainDistanceMax;
-	ShieldDecaysAfter = 5.f;
+	ShieldDecaysAfter = 1.f;
 	ShieldDecayRate = 10.f;
 	
 	WeaponAttachPoint = TEXT("WeaponPoint");
 	WeaponPriority.SetNumUninitialized(0);
-	DefaultInventoryClasses.SetNumUninitialized(0);
+	StartingWeapons.SetNumUninitialized(0);
 	bHasInfiniteAmmo = false;
 	bNeverDropInventory = false;
 	DodgeMomentum = 1024.f;
@@ -163,9 +163,9 @@ void AShooterCharacter::PawnClientRestart()
 void AShooterCharacter::PossessedBy(class AController* InController)
 {
 	Super::PossessedBy(InController);
-	UpdatePawnMeshes();
 	SpawnDefaultInventory();
 	OnPawnPossessed(InController);
+	UpdatePawnMeshes();
 }
 
 void AShooterCharacter::UnPossessed()
@@ -840,13 +840,13 @@ void AShooterCharacter::SpawnDefaultInventory()
 	}
 
 	AShooterWeapon* NewWeapon = NULL;
-	for (int32 i = 0; i < DefaultInventoryClasses.Num(); i++)
+	for (int32 i = 0; i < StartingWeapons.Num(); i++)
 	{
-		if (DefaultInventoryClasses[i])
+		if (StartingWeapons[i])
 		{
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-			NewWeapon = GetWorld()->SpawnActor<AShooterWeapon>(DefaultInventoryClasses[i], SpawnInfo);
+			NewWeapon = GetWorld()->SpawnActor<AShooterWeapon>(StartingWeapons[i], SpawnInfo);
 			AddWeapon(NewWeapon);
 		}
 	}

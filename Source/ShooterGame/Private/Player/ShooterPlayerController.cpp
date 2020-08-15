@@ -550,6 +550,12 @@ void AShooterPlayerController::CleanupSessionOnReturnToMenu()
 	//@HUD return to main menu
 }
 
+void AShooterPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	OnPlayerStateReplicated();
+}
+
 void AShooterPlayerController::ClientGameEnded_Implementation(class AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::ClientGameEnded_Implementation(EndGameFocus, bIsWinner);
@@ -1061,7 +1067,14 @@ void AShooterPlayerController::UpdateChatOption()
 void AShooterPlayerController::ReceivedGameModeClass(TSubclassOf<class AGameModeBase> GameModeClass)
 {
 	Super::ReceivedGameModeClass(GameModeClass);
+	//this is called on clients only
 	GameModeAndStateInitialized();
+}
+
+void AShooterPlayerController::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+	Possessed(P);
 }
 
 void AShooterPlayerController::SetSoundClassVolume(FString ClassName, float NewVolume)

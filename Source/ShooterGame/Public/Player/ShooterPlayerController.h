@@ -15,6 +15,12 @@ class AShooterPlayerController : public APlayerController, public IShooterContro
 public:
 	AShooterPlayerController();
 
+	virtual void OnRep_PlayerState() override;
+
+	/** [client+server] Called after PlayerState was initialized and replicated */
+	UFUNCTION(BlueprintImplementableEvent, Category = Controller)
+	void OnPlayerStateReplicated();
+
 	/** sets spectator focus and rotation.
 	*	@param bViewTargetIsDead if true, then NewViewTarget is a character and is dead. Must be passed as a parameter from the server 
 	*		because AShooterCharacter::Health is not replicated in time for the client to check if NewViewTarget->IsAlive(). */
@@ -240,9 +246,15 @@ public:
 
 	virtual void ReceivedGameModeClass(TSubclassOf<class AGameModeBase> GameModeClass) override;
 
-	/** [client only] Called when the gamemode and gamestate are initialized. */
+	/** [server+client] Called after the gamemode and gamestate are initialized. */
 	UFUNCTION(BlueprintImplementableEvent, Category = Controller)
 	void GameModeAndStateInitialized();
+
+	virtual void AcknowledgePossession(class APawn* P) override;
+
+	/** [server+client] Called when the controller possesses a new pawn. Unlike AController::ReceivePossess, this is called on clients too. */
+	UFUNCTION(BlueprintImplementableEvent, Category = Controller)
+	void Possessed(class APawn* NewPawn);
 
 	/** Called when the weapon has run SetCrosshair() */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Controller")
