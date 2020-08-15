@@ -52,6 +52,11 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	SpellChargeDecayRate = 0.f;
 	SpellChargeDecaysAfter = 5.f;
 	LastSpellCooldownTime = 1.f;
+	SpellChargeGainPerHitpoint = 0.15f;
+	SpellChargeGainDistanceMin = 300.f;
+	SpellChargeGainDistanceMinSquared = SpellChargeGainDistanceMin * SpellChargeGainDistanceMin;
+	SpellChargeGainDistanceMax = 4000.f;
+	SpellChargeGainDistanceMaxSquared = SpellChargeGainDistanceMax * SpellChargeGainDistanceMax;
 
 	MaxShield = 100.f;
 	ShieldGainPerDamagePoint = 0.5f;
@@ -438,14 +443,19 @@ bool AShooterCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent
 	{
 		KillerDmgType = DamageType->GetClass();
 	}
+	AShooterCharacter* KillerCharacter = Killer ? Killer->GetPawn<AShooterCharacter>() : nullptr;
+	if (KillerCharacter)
+	{
+		KillerCharacter->AddSpellChargeOnKill(this);
+	}
 	
-	AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
-	GetWorld()->GetAuthGameMode<AShooterGameMode>()->Killed(Killer, KilledPlayer, this, KillerWeaponClass, KillerDmgType);
+	AController* const KilledPlayerController = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
+	GetWorld()->GetAuthGameMode<AShooterGameMode>()->Killed(Killer, KilledPlayerController, this, KillerWeaponClass, KillerDmgType);
 	
 	NetUpdateFrequency = GetDefault<AShooterCharacter>()->NetUpdateFrequency;
 	GetCharacterMovement()->ForceReplicationUpdate();
 
-	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, Killer, DamageCauser);
+	OnDeath(KillingDamage, DamageEvent, KillerCharacter, Killer, DamageCauser);
 	
 	return true;
 }
@@ -1839,8 +1849,27 @@ void AShooterCharacter::AddSpellCharge(float Amount)
 {
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		SpellCharge = FMath::Clamp(SpellCharge+Amount, 0.f, 1.f);
-		LastSpellChargeGainTime = GetWorld()->GetTimeSeconds();
+		Exec_AddSpellCharge(Amount);
+	}
+}
+
+void AShooterCharacter::Exec_AddSpellCharge_Implementation(float Amount)
+{
+	SpellCharge = FMath::Clamp(SpellCharge + Amount, 0.f, 100.f);
+	LastSpellChargeGainTime = GetWorld()->GetTimeSeconds();
+}
+
+void AShooterCharacter::AddSpellChargeOnKill(AShooterCharacter* KilledCharacter)
+{
+	if (KilledCharacter != nullptr)
+	{
+		const float DistanceToHitCharacterSquared = FVector::DistSquared(GetActorLocation(), KilledCharacter->GetActorLocation());
+		const float InterpAlpha = FMath::GetMappedRangeValueClamped(FVector2D(SpellChargeGainDistanceMinSquared, SpellChargeGainDistanceMaxSquared), FVector2D(1.f, 0.f), DistanceToHitCharacterSquared);
+		const float DistanceMultiplier = FMath::InterpEaseIn(0.f, 1.f, InterpAlpha, 3.f);
+		if (DistanceMultiplier > 0.f)
+		{
+			AddSpellCharge(DistanceMultiplier * SpellChargeGainPerHitpoint * KilledCharacter->GetMaxHealth());
+		}
 	}
 }
 

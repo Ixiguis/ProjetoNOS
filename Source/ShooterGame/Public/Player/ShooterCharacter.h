@@ -399,11 +399,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Spells)
 	void CastSpell(float CooldownTime, bool bUseOvercast);
 
-	/** Adds spell charge, it goes from 0.0 to 1.0. 
-	*	Make sure to call this both on server and on local client. */
-	UFUNCTION(BlueprintCallable, Category=Spells)
+	/** [server] Adds an arbitrary amount of spell charge, it goes from 0.0 to 1.0.  */
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category=Spells)
 	void AddSpellCharge(float Amount);
-	
+
+	/** [server] Calculates and adds spell charge after killing another character */
+	void AddSpellChargeOnKill(AShooterCharacter* KilledCharacter);
+
+protected:
+	UFUNCTION(Client, Reliable)
+	void Exec_AddSpellCharge(float Amount);
+
+public:
 	/** returns true if no spell is on cooldown */
 	UFUNCTION(BlueprintPure, Category=Spells)
 	bool CanCastSpell() const;
@@ -702,7 +709,7 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// Spells
 
-	/** Current spell charge of the character, goes from 0.0 to 1.0. When at 1.0, the character can perform an Overcast spell. */
+	/** Current spell charge of the character, goes from 0.0 to 1.0. When at 100.0, the character can perform an Overcast spell. */
 	UPROPERTY(BlueprintReadOnly, Replicated, Category=Spells)
 	float SpellCharge;
 
@@ -727,6 +734,21 @@ protected:
 	/** current spell cooldown, normalized from 0 to 1 according to last spell's cooldown time */
 	UPROPERTY(BlueprintReadOnly, Category = Spells)
 	float CurrentSpellCooldownTimeNormalized;
+
+	/** How much SpellCharge is gained per point of GetMaxHealth() of the killed character, when distance < ShieldGainDistanceMin. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spells)
+	float SpellChargeGainPerHitpoint;
+
+	/** If distance to killed pawn is <= to this much, gains max amount of SpellCharge, according to SpellChargeGainPerHitpoint. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spells)
+	float SpellChargeGainDistanceMin;
+	float SpellChargeGainDistanceMinSquared;
+
+	/** If distance to killed pawn is > to SpellChargeGainDistanceMin, gains an interpolated amount of spell charge, up to SpellChargeGainDistanceMax.
+	*	Beyond SpellChargeGainDistanceMax, no charge is gained. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spells)
+	float SpellChargeGainDistanceMax;
+	float SpellChargeGainDistanceMaxSquared;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Shield
