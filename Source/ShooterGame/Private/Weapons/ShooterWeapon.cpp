@@ -136,6 +136,14 @@ void AShooterWeapon::Tick(float DeltaSeconds)
 //////////////////////////////////////////////////////////////////////////
 // Inventory
 
+void AShooterWeapon::EquipItem()
+{
+	if (MyPawn)
+	{
+		MyPawn->EquipWeapon(this);
+	}
+}
+
 //called on everyone
 void AShooterWeapon::OnEquip()
 {

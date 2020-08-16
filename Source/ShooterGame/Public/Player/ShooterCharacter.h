@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include "Player/ShooterPersistentUser.h"
 #include "ShooterTypes.h"
-#include "ShooterCharacterMovement.h"
 #include "GameFramework/Character.h"
 #include "ShooterCharacter.generated.h"
 
@@ -129,6 +127,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category=Inventory)
 	class AShooterWeapon* FindWeapon(TSubclassOf<class AShooterWeapon> WeaponClass) const;
+
+	/** Finds an item in inventory, if it's there */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	class AShooterItem* FindItem(TSubclassOf<class AShooterItem> ItemClass) const;
 	
 	/** Notify sent from the weapon that it has no more ammo to shoot */
 	void NotifyOutOfAmmo();
@@ -144,12 +146,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category=Inventory)
 	bool AnyPowerupActive;
 
-	/** 
-	 * [server + local] equips weapon from inventory 
-	 *
-	 * @param Weapon	Weapon to equip
-	 */
+	/** [server + local] equips weapon in inventory */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
 	void EquipWeapon(class AShooterWeapon* Weapon);
+
+	/**[server + local] equips specified weapon class , if character has it in inventory */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void EquipWeaponByClass(TSubclassOf<AShooterWeapon> WeaponClass);
+
+	/** equip an item (if it does anything) and is in inventory */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void EquipItemByClass(TSubclassOf<AShooterItem> ItemClass);
 
 	/** [server] add weapon ammo to inventory
 	*	@return amount of ammo added. */
@@ -470,7 +477,7 @@ public:
 	// Misc
 
 	UFUNCTION(BlueprintCallable, Category = Movement)
-	UShooterCharacterMovement* GetShooterCharacterMovement() const;
+	class UShooterCharacterMovement* GetShooterCharacterMovement() const;
 
 	/** Modifier for all damage dealt by this character */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated, Category=Pawn)
@@ -824,7 +831,7 @@ public:
 	void AddMomentum( FVector Momentum, bool bMassIndependent );
 
 	/** attempts to retrieve the ShooterPersistentUser. */
-	UShooterPersistentUser* GetPersistentUser() const;
+	class UShooterPersistentUser* GetPersistentUser() const;
 
 protected:
 	/** notification when killed, for both the server and client. */

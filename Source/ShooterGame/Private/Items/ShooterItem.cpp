@@ -40,6 +40,10 @@ void AShooterItem::OnLeaveInventory_Implementation()
 	}
 }
 
+void AShooterItem::EquipItem()
+{
+}
+
 void AShooterItem::OnRep_MyPawn()
 {
 	if (MyPawn)

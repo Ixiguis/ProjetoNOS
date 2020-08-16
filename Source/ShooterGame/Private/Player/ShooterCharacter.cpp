@@ -10,6 +10,7 @@
 #include "GameRules/ShooterGameMode.h"
 #include "Animation/AnimMontage.h"
 #include "Player/ShooterLocalPlayer.h"
+#include "Player/ShooterCharacterMovement.h"
 #include "System/ShooterAnimInstance.h"
 #include "Weapons/ShooterProjectile.h"
 #include "Kismet/GameplayStatics.h"
@@ -983,7 +984,19 @@ AShooterWeapon* AShooterCharacter::FindWeapon(TSubclassOf<AShooterWeapon> Weapon
 			return Cast<AShooterWeapon>(Inventory[i]);
 		}
 	}
-	return NULL;
+	return nullptr;
+}
+
+AShooterItem* AShooterCharacter::FindItem(TSubclassOf<AShooterItem> ItemClass) const
+{
+	for (int32 i = 0; i < Inventory.Num(); i++)
+	{
+		if (Inventory[i] && Inventory[i]->IsA(ItemClass))
+		{
+			return Inventory[i];
+		}
+	}
+	return nullptr;
 }
 
 AShooterItem_Powerup* AShooterCharacter::GetFirstPowerup()
@@ -1105,7 +1118,7 @@ bool AShooterCharacter::CanPickupAmmo(TSubclassOf<AShooterWeapon> WeaponClass)
 }
 void AShooterCharacter::EquipWeapon(AShooterWeapon* Weapon)
 {
-	if (Weapon)
+	if (Weapon && Weapon != CurrentWeapon)
 	{
 		if (GetLocalRole() == ROLE_Authority)
 		{
@@ -1117,6 +1130,25 @@ void AShooterCharacter::EquipWeapon(AShooterWeapon* Weapon)
 		}
 	}
 }
+
+void AShooterCharacter::EquipWeaponByClass(TSubclassOf<AShooterWeapon> WeaponClass)
+{
+	AShooterWeapon* Weapon = FindWeapon(WeaponClass);
+	if (Weapon)
+	{
+		EquipWeapon(Weapon);
+	}
+}
+
+void AShooterCharacter::EquipItemByClass(TSubclassOf<AShooterItem> ItemClass)
+{
+	AShooterItem* Item = FindItem(ItemClass);
+	if (Item)
+	{
+		Item->EquipItem();
+	}
+}
+
 
 bool AShooterCharacter::ServerEquipWeapon_Validate(AShooterWeapon* Weapon)
 {
@@ -1133,7 +1165,7 @@ void AShooterCharacter::OnRep_CurrentWeapon(AShooterWeapon* LastWeapon)
 	SetCurrentWeapon(CurrentWeapon, LastWeapon);
 }
 
-void AShooterCharacter::SetCurrentWeapon(class AShooterWeapon* NewWeapon, class AShooterWeapon* LastWeapon)
+void AShooterCharacter::SetCurrentWeapon(AShooterWeapon* NewWeapon, AShooterWeapon* LastWeapon)
 {
 	AShooterWeapon* LocalLastWeapon = NULL;
 	

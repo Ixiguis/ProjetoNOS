@@ -4,6 +4,7 @@
 #include "AI/ShooterAIController.h"
 #include "Weapons/ShooterWeapon.h"
 #include "GameRules/ShooterGameMode.h"
+#include "GameFramework/GameStateBase.h"
 #include "Player/ShooterPlayerState.h"
 #include "Player/ShooterCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"

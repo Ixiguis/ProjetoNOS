@@ -31,6 +31,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=Config)
 	TSubclassOf<class AShooterPickup> ItemPickup;
 
+	/** Equips this item (if applicable) */
+	UFUNCTION(BlueprintCallable, Category = Item)
+	virtual void EquipItem();
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category=Item, Transient, ReplicatedUsing=OnRep_MyPawn)
@@ -39,8 +43,14 @@ protected:
 	UFUNCTION()
 	void OnRep_MyPawn();
 	
+	//////////////////////////////////////////////////////////////////////////
+	// HUD
+	/** Item icon, displayed on the hud */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = HUD)
+	UTexture2D* ItemIcon;
+
 	/** Item's name */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
 	FText ItemName;
-	
+
 };

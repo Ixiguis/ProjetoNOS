@@ -343,6 +343,8 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Inventory
 	
+	virtual void EquipItem() override;
+
 	/** weapon is being equipped by owner pawn */
 	virtual void OnEquip();
 
@@ -509,9 +511,6 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// HUD
-	/** weapon icon, displayed on the hud */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = HUD)
-	UTexture2D* WeaponIcon;
 
 	/** crosshair texture */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = HUD)
@@ -520,7 +519,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = HUD)
 	void SetCrosshair(UTexture2D* NewCrosshair);
 
-	/** Weapon category, used for key bindings and for showing weapons on the HUD */
+	/** @TODO: change this to weapon priority (for selecting on scroll wheel)
+	*	Weapon category, used for key bindings and for showing weapons on the HUD */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=HUD)
 	uint8 WeaponCategory;
 
