@@ -108,6 +108,7 @@ void AShooterPickup::BeginPlay()
 	}
 	else
 	{
+		PickupPSC->DeactivateSystem();
 		const float FirstSpawnTime = GetRespawnTime() + WarmupTime;
 		if (FirstSpawnTime > 0.0f)
 		{
