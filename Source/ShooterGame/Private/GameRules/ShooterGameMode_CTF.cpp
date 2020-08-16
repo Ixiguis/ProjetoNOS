@@ -1,7 +1,12 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. 
 
 #include "GameRules/ShooterGameMode_CTF.h"
-
+#include "GameRules/ShooterFlag.h"
+#include "GameRules/ShooterFlagBase.h"
+#include "GameRules/ShooterGameState.h"
+#include "Player/ShooterCharacter.h"
+#include "Player/ShooterPlayerState.h"
+#include "EngineUtils.h"
 
 AShooterGameMode_CTF::AShooterGameMode_CTF()
 {
@@ -120,18 +125,18 @@ void AShooterGameMode_CTF::LoadFlags()
 		}
 		else
 		{
-			UE_LOG(LogShooter, Warning, TEXT("Flag Base %s has a TeamNumber that was already defined by another Flag Base."), *FlagBase->GetFullName());
+			UE_LOG(LogShooterGameMode, Warning, TEXT("Flag Base %s has a TeamNumber that was already defined by another Flag Base."), *FlagBase->GetFullName());
 		}
 	}
 	if (BasesFound < 2)
 	{
-		UE_LOG(LogShooter, Fatal, TEXT("Map %s has no FlagBases for CTF games (or only one, or they aren't in the persistent level). [apenas os mapas Farce e Fallout suportam CTF]"), *GetWorld()->PersistentLevel->GetFullName());
+		UE_LOG(LogShooterGameMode, Fatal, TEXT("Map %s has no FlagBases for CTF games (or only one, or they aren't in the persistent level). [apenas os mapas Farce e Fallout suportam CTF]"), *GetWorld()->PersistentLevel->GetFullName());
 	}
 	for (uint8 i = 0; i < ShooterGameState->GetNumTeams(); i++)
 	{
 		if (FlagBases[i] == NULL)
 		{
-			UE_LOG(LogShooter, Warning, TEXT("Map %s has no FlagBase defined for team %s. Reducing the team count."), *GetWorld()->PersistentLevel->GetFullName(), *FString::FromInt(i));
+			UE_LOG(LogShooterGameMode, Warning, TEXT("Map %s has no FlagBase defined for team %s. Reducing the team count."), *GetWorld()->PersistentLevel->GetFullName(), *FString::FromInt(i));
 			ShooterGameState->SetNumTeams(i);
 			break;
 		}

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "GameRules/ShooterGameMode_Arena.h"
 #include "ShooterGameMode_TeamDeathMatch.generated.h"
 
 UCLASS()

@@ -2,7 +2,11 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 
-#include "ShooterSpectatorPawn.h"
+#include "Player/ShooterSpectatorPawn.h"
+#include "EngineUtils.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Player/ShooterCharacter.h"
 
 #define MIN_ZOOM 200.f
 #define MAX_ZOOM 800.f

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "SaveGameSystem.h"
+#include "GameRules/ShooterGameMode.h"
 #include "ShooterGameMode_Campaign.generated.h"
 
 /**

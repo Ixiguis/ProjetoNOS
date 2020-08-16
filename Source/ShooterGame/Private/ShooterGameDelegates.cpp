@@ -1,9 +1,10 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
 #include "ShooterGameDelegates.h"
-#include "Player/ShooterPlayerState.h"
 #include "GameDelegates.h"
-
+#include "GameRules/ShooterGameState.h"
+#include "ShooterEngine.h"
+#include "Player/ShooterLocalPlayer.h"
 
 #if !UE_BUILD_SHIPPING
 
@@ -26,7 +27,6 @@ FAutoConsoleCommand CmdPlayGoNext(
 #endif
 
 #endif
-#include "ShooterGameState.h"
 
 
 // respond to requests from a companion app

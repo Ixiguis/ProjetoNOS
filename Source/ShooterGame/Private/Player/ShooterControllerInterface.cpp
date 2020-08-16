@@ -1,6 +1,6 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterControllerInterface.h"
+#include "Player/ShooterControllerInterface.h"
 
 
 UShooterControllerInterface::UShooterControllerInterface(const class FObjectInitializer& PCIP)

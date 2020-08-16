@@ -1,6 +1,15 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. 
 
 #include "GameRules/ShooterGameMode_Invasion.h"
+#include "GameRules/ShooterGameState_Invasion.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "FunctionLibraries/ShooterBlueprintLibrary.h"
+#include "Player/ShooterCharacter.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterPersistentUser.h"
+#include "AI/ShooterAIController.h"
+#include "AI/ShooterMonsterController.h"
 
 
 AShooterGameMode_Invasion::AShooterGameMode_Invasion()
@@ -175,7 +184,7 @@ bool AShooterGameMode_Invasion::GetSpawnPoint(FVector& OutSpawnLocation, AShoote
 
 	if (Nav == NULL)
 	{
-		UE_LOG(LogShooter, Warning, TEXT("Map %s has no navigation mesh. Cannot spawn monsters."), *GetWorld()->PersistentLevel->GetFullName());
+		UE_LOG(LogShooterGameMode, Warning, TEXT("Map %s has no navigation mesh. Cannot spawn monsters."), *GetWorld()->PersistentLevel->GetFullName());
 		return false;
 	}
 	FNavLocation PossibleSpawnPoint;

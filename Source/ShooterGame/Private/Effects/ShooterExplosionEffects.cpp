@@ -1,8 +1,11 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterGame.h"
-#include "ShooterExplosionEffect.h"
+#include "Effects/ShooterExplosionEffect.h"
+#include "Particles/ParticleSystem.h"
+#include "Components/PointLightComponent.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 
 AShooterExplosionEffect::AShooterExplosionEffect()
 {

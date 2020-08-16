@@ -2,9 +2,11 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 #pragma once
-#include "ShooterPersistentUser.h"
+
+#include "Player/ShooterPersistentUser.h"
 #include "ShooterTypes.h"
 #include "ShooterCharacterMovement.h"
+#include "GameFramework/Character.h"
 #include "ShooterCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBindableEvent_CharacterFired, AShooterWeapon*, Weapon, uint8, FireMode);

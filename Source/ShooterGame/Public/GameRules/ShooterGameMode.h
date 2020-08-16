@@ -2,13 +2,13 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 #pragma once
 
-#include "CoreMinimal.h"
-#include "OnlineIdentityInterface.h"
-#include "ShooterGameUserSettings.h"
-#include "GameRules/ShooterGameState.h"
-#include "AI/ShooterAIController.h"
+#include "GameFramework/GameMode.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 #include "ShooterTypes.h"
+#include "UI/ShooterMessageHandler.h"
 #include "ShooterGameMode.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogShooterGameMode, Log, All);
 
 UCLASS(config=Game)
 class AShooterGameMode : public AGameMode
@@ -83,7 +83,7 @@ public:
 	void CreateBotControllers();
 
 	/** Create a bot */
-	AShooterAIController* CreateBot(int32 BotNum);	
+	class AShooterAIController* CreateBot(int32 BotNum);	
 
 	/** Defines all bots colors */
 	void AssignBotsColors();
@@ -183,16 +183,16 @@ protected:
 	int32 MaxBots;
 	
 	UPROPERTY()
-	TArray<AShooterAIController*> BotControllers;
+	TArray<class AShooterAIController*> BotControllers;
 	
-	AShooterGameState* ShooterGameState;
+	class AShooterGameState* ShooterGameState;
 
 	bool bNeedsBotCreation;
 
 	void StartBots();
 
 	/** initialization for bot after creation */
-	virtual void InitBot(AShooterAIController* AIC, int32 BotNum);
+	virtual void InitBot(class AShooterAIController* AIC, int32 BotNum);
 
 	/** check who won. Returns the focus actor. */
 	virtual class AActor* DetermineMatchWinner();
@@ -249,7 +249,7 @@ public:
 	int32 GetWarmupTime();
 
 	/** User settings pointer */
-	UShooterGameUserSettings* UserSettings;
+	class UShooterGameUserSettings* UserSettings;
 
 	/** sets all player's remaining lives to NewRemainingLives */
 	void SetPlayersLifes(int32 NewRemainingLifes);

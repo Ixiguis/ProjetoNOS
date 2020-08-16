@@ -1,6 +1,7 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPickup_Armor.h"
+#include "Items/ShooterPickup_Armor.h"
+#include "Player/ShooterCharacter.h"
 
 #define LOCTEXT_NAMESPACE "ShooterGame.Pickup"
 
@@ -10,7 +11,7 @@ AShooterPickup_Armor::AShooterPickup_Armor()
 	RespawnTime = 30.f;
 }
 
-bool AShooterPickup_Armor::CanBePickedUp(class AShooterCharacter* TestPawn)
+bool AShooterPickup_Armor::CanBePickedUp(AShooterCharacter* TestPawn)
 {
 	if (!Super::CanBePickedUp(TestPawn))
 	{
@@ -27,7 +28,7 @@ bool AShooterPickup_Armor::CanBePickedUp(class AShooterCharacter* TestPawn)
 	return CanPickup;
 }
 
-void AShooterPickup_Armor::GivePickupTo(class AShooterCharacter* Pawn)
+void AShooterPickup_Armor::GivePickupTo(AShooterCharacter* Pawn)
 {
 	if (Pawn)
 	{

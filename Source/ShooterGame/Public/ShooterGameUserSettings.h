@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "GameFramework/GameUserSettings.h"
 #include "ShooterGameUserSettings.generated.h"
 
 UENUM(BlueprintType)

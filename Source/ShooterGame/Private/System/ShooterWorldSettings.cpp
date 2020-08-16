@@ -1,6 +1,8 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. 
 
-#include "ShooterWorldSettings.h"
+#include "System/ShooterWorldSettings.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Serialization/JsonSerializer.h"
 #if WITH_EDITOR
 #include "Editor.h"
 #endif

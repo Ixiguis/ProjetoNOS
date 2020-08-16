@@ -4,10 +4,12 @@
 #pragma once
 
 #include "ShooterDamageType.h"
-#include "ShooterItem.h"
+#include "Items/ShooterItem.h"
 #include "ShooterWeapon.generated.h"
 
 #define NUM_FIRING_MODES 2
+
+DECLARE_LOG_CATEGORY_EXTERN(LogShooterWeapon, Log, All);
 
 namespace EWeaponState
 {
@@ -171,7 +173,7 @@ struct FWeaponEffects
 
 	/** camera shake on firing */
 	UPROPERTY(EditDefaultsOnly, Category=Effects)
-	TSubclassOf<UCameraShake> FireCameraShake;
+	TSubclassOf<class UCameraShake> FireCameraShake;
 
 	/** single fire sound (or start fire sound if bLoopedFireSound is true) */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
@@ -1000,7 +1002,7 @@ protected:
 
 	void IncrementMuzzleIndex();
 
-	inline AShooterGameState* GetGameState() const { return GetWorld()->GetGameState<AShooterGameState>(); }
+	class AShooterGameState* GetGameState() const;
 
 	//////////////////////////////////////////////////////////////////////////
 	// FM_Charge mode
@@ -1040,11 +1042,6 @@ FORCEINLINE int32 AShooterWeapon::GetAmmoPerClip() const
 FORCEINLINE int32 AShooterWeapon::GetCurrentAmmoInClip() const
 {
 	return CurrentAmmoInClip;
-}
-
-FORCEINLINE class AController* AShooterWeapon::GetPawnOwnerController() const
-{
-	return MyPawn ? MyPawn->GetController() : NULL;
 }
 
 FORCEINLINE TSubclassOf<UShooterDamageType> AShooterWeapon::GetInstantHitDamageType(uint8 FireMode) const

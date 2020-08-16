@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "GameFramework/Actor.h"
 #include "ShooterItem.generated.h"
 
 /**
@@ -16,7 +17,7 @@ class AShooterItem : public AActor
 public:
 	AShooterItem();
 
-	void SetOwningPawn(AShooterCharacter* NewOwner);
+	void SetOwningPawn(class AShooterCharacter* NewOwner);
 
 	/** item enters MyPawn's inventory. Called automatically when MyPawn changes. */
 	UFUNCTION(BlueprintImplementableEvent, Category=Item)
@@ -33,7 +34,7 @@ public:
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category=Item, Transient, ReplicatedUsing=OnRep_MyPawn)
-	AShooterCharacter* MyPawn;
+	class AShooterCharacter* MyPawn;
 	
 	UFUNCTION()
 	void OnRep_MyPawn();

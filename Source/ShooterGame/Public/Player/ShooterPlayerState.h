@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "GameFramework/PlayerState.h"
+#include "TimerManager.h"
 #include "ShooterPlayerState.generated.h"
 
 UCLASS(config=Game)

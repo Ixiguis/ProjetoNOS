@@ -2,6 +2,9 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 #pragma once
+
+
+#include "GameFramework/SpectatorPawn.h"
 #include "ShooterSpectatorPawn.generated.h"
 
 
@@ -34,8 +37,8 @@ public:
 	bool bAllowFreeCam;
 
 protected:
-	USpringArmComponent* CameraBoom;
-	UCameraComponent* Camera;
+	class USpringArmComponent* CameraBoom;
+	class UCameraComponent* Camera;
 	
 	// Frame rate linked look
 	void LookUpAtRate(float Val);
@@ -48,13 +51,13 @@ protected:
 	inline bool IsFreeCam() const { return CurrentTarget == NULL; }
 
 	/** current view target */
-	AActor* CurrentTarget;
+	class AActor* CurrentTarget;
 
 	/** returns the first alive ShooterCharacter found in the world's pawn iterator */
-	AShooterCharacter* GetFirstCharacter() const;
+	class AShooterCharacter* GetFirstCharacter() const;
 	
 	/** returns the last alive ShooterCharacter found in the world's pawn iterator */
-	AShooterCharacter* GetLastCharacter() const;
+	class AShooterCharacter* GetLastCharacter() const;
 
 	float DesiredCameraDistance;
 

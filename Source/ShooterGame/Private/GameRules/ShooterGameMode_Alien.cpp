@@ -1,7 +1,10 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. 
 
 #include "GameRules/ShooterGameMode_Alien.h"
-
+#include "GameRules/ShooterGameState.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterCharacter.h"
 
 AShooterGameMode_Alien::AShooterGameMode_Alien()
 {
@@ -39,7 +42,7 @@ void AShooterGameMode_Alien::ChooseNewAlien()
 		//dedicated server with no players
 		GetWorldTimerManager().SetTimer(ChooseNewAlienHandle, this, &AShooterGameMode_Alien::ChooseNewAlien, 1.f, false);
 		return;
-	}
+	} 
 	for (APlayerState* Player : GameState->PlayerArray)
 	{
 		//remove players that already played as Alien
@@ -159,7 +162,7 @@ AShooterCharacter* AShooterGameMode_Alien::SpawnAndPossessAlienPawn(AController*
 	AActor* SpawnPoint = ChoosePlayerStart(InController);
 	if (SpawnPoint == NULL)
 	{
-		UE_LOG(LogShooter, Warning, TEXT("Could not find a spawn point for the Alien (Alien game mode)."));
+		UE_LOG(LogShooterGameMode, Warning, TEXT("Could not find a spawn point for the Alien (Alien game mode)."));
 		GetWorldTimerManager().SetTimer(ChooseNewAlienHandle, this, &AShooterGameMode_Alien::ChooseNewAlien, 5.f, false);
 		return NULL;
 	}

@@ -1,6 +1,6 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. .
 
-#include "ShooterAnimInstance.h"
+#include "System/ShooterAnimInstance.h"
 
 
 UShooterAnimInstance::UShooterAnimInstance()

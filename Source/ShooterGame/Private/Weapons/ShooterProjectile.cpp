@@ -1,7 +1,17 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterProjectile.h"
+#include "Weapons/ShooterProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Weapons/ShooterWeapon.h"
+#include "Engine/DirectionalLight.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
+#include "Components/AudioComponent.h"
+#include "GameRules/ShooterGameMode.h"
+#include "Player/ShooterCharacter.h"
+#include "Net/UnrealNetwork.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AShooterProjectile::AShooterProjectile()
 {

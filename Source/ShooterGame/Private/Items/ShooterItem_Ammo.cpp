@@ -1,7 +1,9 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterItem_Ammo.h"
+#include "Items/ShooterItem_Ammo.h"
+#include "Weapons/ShooterWeapon.h"
+#include "Net/UnrealNetwork.h"
 
 AShooterItem_Ammo::AShooterItem_Ammo()
 {

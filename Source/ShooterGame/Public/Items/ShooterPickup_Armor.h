@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Items/ShooterPickup.h"
 #include "ShooterPickup_Armor.generated.h"
 
 /**

@@ -1,7 +1,8 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPickup_Health.h"
+#include "Items/ShooterPickup_Health.h"
+#include "Player/ShooterCharacter.h"
 
 #define LOCTEXT_NAMESPACE "ShooterGame.Pickup"
 
@@ -11,7 +12,7 @@ AShooterPickup_Health::AShooterPickup_Health()
 	BoostHealth = false;
 }
 
-bool AShooterPickup_Health::CanBePickedUp(class AShooterCharacter* TestPawn)
+bool AShooterPickup_Health::CanBePickedUp(AShooterCharacter* TestPawn)
 {
 	if (!Super::CanBePickedUp(TestPawn))
 	{
@@ -29,7 +30,7 @@ bool AShooterPickup_Health::CanBePickedUp(class AShooterCharacter* TestPawn)
 	return false;
 }
 
-void AShooterPickup_Health::GivePickupTo(class AShooterCharacter* Pawn)
+void AShooterPickup_Health::GivePickupTo(AShooterCharacter* Pawn)
 {
 	if (Pawn)
 	{

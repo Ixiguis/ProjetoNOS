@@ -2,6 +2,9 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 #pragma once
 
+
+#include "GameFramework/DamageType.h"
+#include "Engine/Canvas.h"
 #include "ShooterDamageType.generated.h"
 
 // DamageType class that specifies an icon to display
@@ -19,11 +22,11 @@ public:
 
 	/** force feedback effect to play on a player hit by this damage type */
 	UPROPERTY(EditDefaultsOnly, Category=Effects)
-	UForceFeedbackEffect *HitForceFeedback;
+	class UForceFeedbackEffect *HitForceFeedback;
 
 	/** force feedback effect to play on a player killed by this damage type */
 	UPROPERTY(EditDefaultsOnly, Category=Effects)
-	UForceFeedbackEffect *KilledForceFeedback;
+	class UForceFeedbackEffect *KilledForceFeedback;
 };
 
 

@@ -1,9 +1,13 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
-#include "BTDecorator_HasLoSTo.h"
+#include "AI/BTDecorator_HasLoSTo.h"
+#include "AI/ShooterAIController.h"
+#include "Player/ShooterCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "ShooterTypes.h"
+#include "Player/ShooterPlayerState.h"
 
 UBTDecorator_HasLoSTo::UBTDecorator_HasLoSTo()
 {

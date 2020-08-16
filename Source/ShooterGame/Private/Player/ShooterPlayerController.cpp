@@ -1,13 +1,25 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPlayerController.h"
+#include "Player/ShooterPlayerController.h"
 #include "Online.h"
-#include "OnlineAchievementsInterface.h"
-#include "OnlineEventsInterface.h"
-#include "OnlineIdentityInterface.h"
-#include "OnlineSessionInterface.h"
+#include "Interfaces/OnlineEventsInterface.h"
+#include "Interfaces/OnlineIdentityInterface.h"
+#include "Interfaces/OnlineSessionInterface.h"
+#include "ShooterGameUserSettings.h"
 #include "ShooterGameViewportClient.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerInput.h"
+#include "Player/ShooterCharacter.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterLocalPlayer.h"
+#include "Player/ShooterSpectatorPawn.h"
+#include "Player/ShooterPlayerCameraManager.h"
+#include "Player/ShooterCheatManager.h"
+#include "Player/ShooterPersistentUser.h"
+#include "GameRules/ShooterGameMode.h"
+#include "ShooterLeaderboards.h"
+#include "Net/UnrealNetwork.h"
 
 #define  ACH_FRAG_SOMEONE	TEXT("ACH_FRAG_SOMEONE")
 #define  ACH_SOME_KILLS		TEXT("ACH_SOME_KILLS")
@@ -225,7 +237,7 @@ void AShooterPlayerController::ClientSetSpectatorCamera_Implementation(AActor* N
 	if (Spec)
 	{
 		Spec->SetViewTarget(NewViewTarget, bViewTargetIsDead);
-		AShooterPlayerState* PS = GetShooterPlayerState();
+		AShooterPlayerState* PS = GetPlayerState<AShooterPlayerState>();
 		if (PS && !PS->HasLivesRemaining())
 		{
 			Spec->bAllowFreeCam = true;

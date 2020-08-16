@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ShooterPickup.h"
+#include "Items/ShooterPickup.h"
 #include "ShooterPickup_Ammo.generated.h"
 
 /**

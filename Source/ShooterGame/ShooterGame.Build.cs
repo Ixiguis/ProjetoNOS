@@ -7,8 +7,9 @@ public class ShooterGame : ModuleRules
 {
 	public ShooterGame(ReadOnlyTargetRules Target) : base(Target)
 	{
-        
-		PrivatePCHHeaderFile = "Public/ShooterGame.h";
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        bEnforceIWYU = true;
+        bFasterWithoutUnity = true;
 
 		PrivateIncludePaths.AddRange(
 			new string[] {
@@ -37,9 +38,6 @@ public class ShooterGame : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[] {
                 "InputCore",
-                //"Slate",
-                //"SlateCore",
-                // "UMG",
 			}
 		);
         

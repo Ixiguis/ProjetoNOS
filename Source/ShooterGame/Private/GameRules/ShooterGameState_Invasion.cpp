@@ -1,7 +1,7 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. 
 
 #include "GameRules/ShooterGameState_Invasion.h"
-
+#include "Net/UnrealNetwork.h"
 
 AShooterGameState_Invasion::AShooterGameState_Invasion()
 {

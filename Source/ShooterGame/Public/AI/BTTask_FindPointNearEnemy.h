@@ -1,6 +1,7 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
+#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "BehaviorTree/BTNode.h"
 #include "BTTask_FindPointNearEnemy.generated.h"
 

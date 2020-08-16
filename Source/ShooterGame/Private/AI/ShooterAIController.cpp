@@ -1,12 +1,17 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterAIController.h"
-#include "ShooterWeapon.h"
+#include "AI/ShooterAIController.h"
+#include "Weapons/ShooterWeapon.h"
+#include "GameRules/ShooterGameMode.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
+#include "EngineUtils.h"
 
 #define MIN_WEAPON_SWITCH_INTERVAL 3.0f
 

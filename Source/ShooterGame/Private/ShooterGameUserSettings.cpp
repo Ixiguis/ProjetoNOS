@@ -2,7 +2,9 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 #include "ShooterGameUserSettings.h"
-
+#include "SoundDefinitions.h"
+#include "Sound/SoundClass.h"
+#include "Player/ShooterPlayerController.h"
 
 /** Get the percentage scale for a given quality level. Copied from Scalability.cpp. */
 static int32 GetRenderScaleLevelFromQualityLevel(int32 InQualityLevel)

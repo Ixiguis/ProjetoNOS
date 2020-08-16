@@ -1,7 +1,13 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPersistentUser.h"
+#include "Player/ShooterPersistentUser.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/ShooterPlayerController.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Player/ShooterCharacter.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterLocalPlayer.h"
 
 UShooterPersistentUser::UShooterPersistentUser()
 {
@@ -297,7 +303,7 @@ void UShooterPersistentUser::SetPlayerColor(uint8 ColorIndex, FLinearColor NewCo
 	AShooterPlayerController* PC = GetPlayerController();
 	if (PC)
 	{
-		AShooterPlayerState* PS = PC->GetShooterPlayerState();
+		AShooterPlayerState* PS = PC->GetPlayerState<AShooterPlayerState>();
 		if (PS)
 		{
 			PS->SetColorLocal(ColorIndex, NewColor);
@@ -393,7 +399,7 @@ void UShooterPersistentUser::ReplicateColors()
 	AShooterPlayerController* PC = GetPlayerController();
 	if (PC)
 	{
-		AShooterPlayerState* PS = PC->GetShooterPlayerState();
+		AShooterPlayerState* PS = PC->GetPlayerState<AShooterPlayerState>();
 		if (PS)
 		{
 			for (int32 i = 0; i<PlayerColors.Num(); i++)

@@ -2,6 +2,7 @@
 
 #pragma once
 #include "ShooterTypes.h"
+#include "Engine/GameViewportClient.h"
 #include "ShooterGameViewportClient.generated.h"
 
 

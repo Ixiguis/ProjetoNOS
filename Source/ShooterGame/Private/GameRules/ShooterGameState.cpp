@@ -1,7 +1,15 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterGameState.h"
+#include "GameRules/ShooterGameState.h"
+#include "GameRules/ShooterGameMode.h"
+#include "UI/ShooterMessageHandler.h"
+#include "Player/ShooterPlayerController.h"
+#include "Player/ShooterPlayerState.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Net/UnrealNetwork.h"
+
+DEFINE_LOG_CATEGORY(LogShooterGameState);
 
 AShooterGameState::AShooterGameState()
 {
@@ -209,7 +217,7 @@ FGameMessage AShooterGameState::GetGameMessage(TEnumAsByte<EMessageTypes::Type> 
 		TheMessage = MessageHandlerInst->FlagCapturedMessage;
 		break;
 	default:
-		UE_LOG(LogShooter, Warning, TEXT("Invalid message type: %d"), (uint8)MessageType);
+		UE_LOG(LogShooterGameMode, Warning, TEXT("Invalid message type: %d"), (uint8)MessageType);
 	}
 	return TheMessage;
 }

@@ -1,8 +1,17 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPickup.h"
-#include "ShooterPickup_Powerup.h"
+#include "Items/ShooterPickup.h"
+#include "Items/ShooterPickup_Powerup.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Player/ShooterPlayerController.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "GameRules/ShooterGameMode.h"
+#include "Player/ShooterCharacter.h"
+#include "Net/UnrealNetwork.h"
+#include "Components/CapsuleComponent.h"
+#include "Sound/SoundCue.h"
 
 AShooterPickup::AShooterPickup()
 {

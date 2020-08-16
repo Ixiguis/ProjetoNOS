@@ -1,7 +1,12 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterCheatManager.h"
+#include "Player/ShooterCheatManager.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterPlayerController.h"
+#include "AI/ShooterAIController.h"
+#include "GameRules/ShooterGameState.h"
+#include "GameRules/ShooterGameMode.h"
 
 UShooterCheatManager::UShooterCheatManager()
 {

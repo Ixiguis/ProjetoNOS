@@ -1,8 +1,16 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterBlueprintLibrary.h"
-#include "ShooterGameMode_Arena.h"
+#include "GameRules/ShooterGameMode_Arena.h"
+#include "GameRules/ShooterGameState.h"
+#include "Player/ShooterPlayerController.h"
+#include "FunctionLibraries/ShooterBlueprintLibrary.h"
+#include "EngineUtils.h"
+#include "UObject/ConstructorHelpers.h"
+#include "GameFramework/PlayerStart.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterCharacter.h"
+#include "Sound/SoundCue.h"
 
 AShooterGameMode_Arena::AShooterGameMode_Arena()
 {

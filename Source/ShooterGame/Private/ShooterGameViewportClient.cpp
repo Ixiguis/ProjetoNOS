@@ -1,8 +1,9 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
 #include "ShooterGameViewportClient.h"
-#include "SSafeZone.h"
-#include "SThrobber.h"
+#include "Player/ShooterLocalPlayer.h"
+#include "ShooterGameUserSettings.h"
+#include "FunctionLibraries/ShooterBlueprintLibrary.h"
 
 UShooterGameViewportClient::UShooterGameViewportClient()
 {

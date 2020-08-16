@@ -1,7 +1,11 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All rights reserved.
 
 #include "ShooterGameInstance.h"
-
+#include "Player/ShooterPlayerController.h"
+#include "Player/ShooterLocalPlayer.h"
+#include "GameRules/ShooterGameState.h"
+#include "GameRules/ShooterGameMode.h"
+#include "GameRules/ShooterGameSession.h"
 
 UShooterGameInstance::UShooterGameInstance()
 {

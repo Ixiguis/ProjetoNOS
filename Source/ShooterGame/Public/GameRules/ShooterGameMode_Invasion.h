@@ -8,6 +8,72 @@
 #include "NavigationSystem.h"
 #include "ShooterGameMode_Invasion.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct FInvasionMonster
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionMonster)
+	TSubclassOf<AShooterCharacter> PawnClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionMonster)
+	int32 HealthOverride;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionMonster)
+	float MaxWalkSpeedOverride;
+
+	FInvasionMonster()
+	{
+		HealthOverride = -1;
+		MaxWalkSpeedOverride = -1.f;
+	}
+	FInvasionMonster(TSubclassOf<AShooterCharacter> InPawnClass, int32 InHealthOverride = -1, float InMaxWalkSpeedOverride = -1.f)
+	{
+		PawnClass = InPawnClass;
+		HealthOverride = InHealthOverride;
+		MaxWalkSpeedOverride = InMaxWalkSpeedOverride;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FInvasionWave
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** when a monster is spawned, it will be picked randomly from this array */
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionWave)
+		TArray<FInvasionMonster> InvasionMonsters;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionWave)
+	int32 MaxMonsters;
+
+	/** wave duration, in seconds. Stops spawning more monsters if the duration was reached (even if MaxMonsters wasn't reached). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionWave)
+	float WaveDuration;
+
+	/** how many monsters will spawn per minute (up to MaxMonsters) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionWave)
+	float MonstersSpawnRate;
+
+	/** how long players have to prepare themselves before monsters start spawning. In seconds. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = InvasionWave)
+	float WarmupTime;
+
+	FInvasionWave(int32 InMaxMonsters = 50, float InWaveDuration = 240.f, float InWarmupTime = 10.f, float InMonstersSpawnRate = 20.f)
+	{
+		MaxMonsters = InMaxMonsters;
+		WaveDuration = InWaveDuration;
+		WarmupTime = InWarmupTime;
+		MonstersSpawnRate = InMonstersSpawnRate;
+	}
+	void AddInvasionMonster(FInvasionMonster Monster)
+	{
+		InvasionMonsters.Add(Monster);
+	}
+};
+
+
 /**
  * 
  */

@@ -3,6 +3,9 @@
 #pragma once
 
 #include "Engine/GameInstance.h"
+#include "ShooterTypes.h"
+#include "Interfaces/OnlineSessionInterface.h"
+#include "OnlineKeyValuePair.h"
 #include "ShooterGameInstance.generated.h"
 
 /**

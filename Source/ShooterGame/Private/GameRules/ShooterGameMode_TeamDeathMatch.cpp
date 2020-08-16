@@ -1,7 +1,14 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterGameMode_TeamDeathMatch.h"
+#include "GameRules/ShooterGameMode_TeamDeathMatch.h"
+#include "GameRules/ShooterGameState.h"
+#include "Player/ShooterPlayerController.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/ShooterCharacter.h"
+#include "Player/ShooterPlayerState.h"
+#include "ShooterTeamStart.h"
+#include "AI/ShooterAIController.h"
 
 AShooterGameMode_TeamDeathMatch::AShooterGameMode_TeamDeathMatch()
 {

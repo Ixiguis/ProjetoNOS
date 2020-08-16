@@ -1,8 +1,11 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
-#include "ShooterGameSession.h"
-#include "ShooterOnlineGameSettings.h"
+#include "GameRules/ShooterGameSession.h"
+#include "GameRules/ShooterOnlineGameSettings.h"
+#include "OnlineSubsystem.h"
 #include "OnlineSubsystemSessionSettings.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/ShooterPlayerController.h"
 
 namespace
 {

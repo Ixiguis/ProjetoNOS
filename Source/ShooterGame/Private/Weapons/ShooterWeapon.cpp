@@ -1,7 +1,22 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterWeapon.h"
+#include "Effects/ShooterImpactEffect.h"
+#include "Weapons/ShooterWeapon.h"
+#include "Weapons/ShooterProjectile.h"
+#include "GameRules/ShooterGameState.h"
+#include "GameFramework/ForceFeedbackEffect.h"
+#include "Camera/CameraShake.h"
+#include "Player/ShooterPlayerController.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/ShooterCharacter.h"
+#include "Net/UnrealNetwork.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Components/AudioComponent.h"
+#include "AI/ShooterAIController.h"
+#include "Sound/SoundCue.h"
+
+DEFINE_LOG_CATEGORY(LogShooterWeapon);
 
 // To maintain consistency between clients and server on RandomStream::VRandCone() calls,
 // we'll use a constant vector on that function, instead of passing the AimDir directly,
@@ -1800,6 +1815,11 @@ float AShooterWeapon::GetMaxChargingTime() const
 	return MaxChargeTime + ChargeRandomAdd;
 }
 
+AController* AShooterWeapon::GetPawnOwnerController() const
+{
+	return MyPawn ? MyPawn->GetController() : NULL;
+}
+
 bool AShooterWeapon::ServerStartCharging_Validate(uint8 RandomSeed)
 {
 	return true;
@@ -1951,4 +1971,9 @@ bool AShooterWeapon::IsLocallyControlled() const
 bool AShooterWeapon::IsFirstPerson() const
 {
 	return MyPawn && MyPawn->IsFirstPerson();
+}
+
+AShooterGameState* AShooterWeapon::GetGameState() const
+{ 
+	return GetWorld()->GetGameState<AShooterGameState>(); 
 }

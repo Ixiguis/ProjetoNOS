@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "GameRules/ShooterGameMode.h"
 #include "ShooterGameMode_Arena.generated.h"
 
 /**
@@ -34,7 +35,7 @@ protected:
 	virtual void DefaultTimer() override;
 	
 	UPROPERTY(EditDefaultsOnly, Category="GameMode")
-	USoundCue* SndStartMatchAnnouncer;
+	class USoundCue* SndStartMatchAnnouncer;
 	
 	/** checks if the match has ended due to score limit. Calls FinishMatch() if match ended. */
 	virtual void CheckMatchEnd();

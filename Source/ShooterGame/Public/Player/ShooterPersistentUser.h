@@ -2,7 +2,10 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 #pragma once
+
+#include "GameFramework/SaveGame.h"
 #include "ShooterTypes.h"
+#include "GameRules/ShooterGameMode_Invasion.h"
 #include "ShooterPersistentUser.generated.h"
 
 UCLASS(BlueprintType)
@@ -95,10 +98,10 @@ public:
 	void SetIsRecordingDemos(const bool InbIsRecordingDemos);
 
 	UFUNCTION(BlueprintCallable, Category = SaveGame)
-	void SetWeaponGroup(TSubclassOf<AShooterWeapon> Weapon, int32 NewGroup);
+	void SetWeaponGroup(TSubclassOf<class AShooterWeapon> Weapon, int32 NewGroup);
 	
 	UFUNCTION(BlueprintCallable, Category = SaveGame)
-	int32 GetWeaponGroup(TSubclassOf<AShooterWeapon> Weapon);
+	int32 GetWeaponGroup(TSubclassOf<class AShooterWeapon> Weapon);
 
 protected:
 	void SetToDefaults();

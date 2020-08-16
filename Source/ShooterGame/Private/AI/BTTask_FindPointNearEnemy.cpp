@@ -1,8 +1,8 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
-#include "BTTask_FindPointNearEnemy.h"
-#include "ShooterAIController.h"
-#include "ShooterCharacter.h"
+#include "AI/BTTask_FindPointNearEnemy.h"
+#include "AI/ShooterAIController.h"
+#include "Player/ShooterCharacter.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"

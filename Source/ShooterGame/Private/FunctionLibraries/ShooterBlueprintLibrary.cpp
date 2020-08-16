@@ -1,11 +1,18 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterBlueprintLibrary.h"
-#include "ShooterControllerInterface.h"
-#include "ShooterGameMode_FreeForAll.h"
-#include "ShooterGameMode_TeamDeathmatch.h"
-#include "ShooterGameMode_CTF.h"
+#include "FunctionLibraries/ShooterBlueprintLibrary.h"
+#include "Player/ShooterControllerInterface.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterCharacter.h"
+#include "GameRules/ShooterGameMode_FreeForAll.h"
+#include "GameRules/ShooterGameMode_TeamDeathmatch.h"
+#include "GameRules/ShooterGameMode_CTF.h"
+#include "ShooterGameUserSettings.h"
+#include "EngineUtils.h"
+#include "Engine/DirectionalLight.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/LightComponent.h"
 
 UShooterBlueprintLibrary::UShooterBlueprintLibrary()
 {

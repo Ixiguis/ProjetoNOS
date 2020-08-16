@@ -1,12 +1,27 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterCharacter.h"
-#include "ShooterPickup.h"
+#include "Player/ShooterCharacter.h"
+#include "Items/ShooterPickup_Weapon.h"
+#include "Items/ShooterPickup_Ammo.h"
+#include "Items/ShooterPickup_Powerup.h"
+#include "Items/ShooterItem_Ammo.h"
+#include "Items/ShooterItem_Powerup.h"
+#include "GameRules/ShooterGameMode.h"
 #include "Animation/AnimMontage.h"
-#include "ShooterLocalPlayer.h"
-#include "ShooterAnimInstance.h"
-#include "ShooterProjectile.h"
+#include "Player/ShooterLocalPlayer.h"
+#include "System/ShooterAnimInstance.h"
+#include "Weapons/ShooterProjectile.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Player/ShooterPlayerController.h"
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterPersistentUser.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Net/UnrealNetwork.h"
+#include "Components/CapsuleComponent.h"
+#include "Sound/SoundCue.h"
+#include "AI/ShooterAIController.h"
 
 AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UShooterCharacterMovement>(ACharacter::CharacterMovementComponentName))
@@ -1880,7 +1895,7 @@ bool AShooterCharacter::CanCastSpell() const
 
 bool AShooterCharacter::CanCastOvercastSpell() const
 {
-	return CanCastSpell() && SpellCharge == 1.f;
+	return CanCastSpell() && SpellCharge == 100.f;
 }
 
 float AShooterCharacter::GetMaxHealth() const

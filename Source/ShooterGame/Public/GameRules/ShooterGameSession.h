@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "GameFramework/GameSession.h"
 #include "Online.h"
 #include "ShooterLeaderboards.h"
 #include "ShooterGameSession.generated.h"

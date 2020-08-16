@@ -2,7 +2,9 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 #pragma once
 
-#include "ShooterWeapon.h"
+#include "GameFramework/Actor.h"
+#include "Weapons/ShooterDamageType.h"
+#include "Effects/ShooterExplosionEffect.h"
 #include "ShooterProjectile.generated.h"
 
 // 
@@ -21,7 +23,7 @@ public:
 	/** setup velocity */
 	void InitVelocity(FVector& ShootDirection);
 
-	void InitProjectile(APawn* InInstigator, uint8& InRandomSeed, AShooterWeapon* InOwnerWeapon, FVector& ShootDirection);
+	void InitProjectile(APawn* InInstigator, uint8& InRandomSeed, class AShooterWeapon* InOwnerWeapon, FVector& ShootDirection);
 
 	/** handle hit */
 	UFUNCTION()
@@ -68,7 +70,7 @@ public:
 	
 	/** effects for explosion */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Effects)
-	TSubclassOf<class AShooterExplosionEffect> ExplosionTemplate;
+	TSubclassOf<AShooterExplosionEffect> ExplosionTemplate;
 
 	/** whether this projectile can be deflected with the sword. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
@@ -79,7 +81,7 @@ public:
 	uint8 RandomSeed;
 	
 	UPROPERTY(BlueprintReadOnly, Replicated, Category=Projectile)
-	AShooterWeapon* OwnerWeapon;
+	class AShooterWeapon* OwnerWeapon;
 
 protected:
 	
@@ -97,24 +99,24 @@ protected:
 
 	/** movement component */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Projectile)
-	UProjectileMovementComponent* MovementComp;
+	class UProjectileMovementComponent* MovementComp;
 
 	/** collisions */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Projectile)
-	USphereComponent* CollisionComp;
+	class USphereComponent* CollisionComp;
 
 	/** The projectile's particle component, e.g. the missile itself. Is deactivated and hidden immediately upon explosion. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Projectile)
-	UParticleSystemComponent* MainParticleComp;
+	class UParticleSystemComponent* MainParticleComp;
 	
 	/** The projectile's trail particle component, e.g. the missile's smoke trail. Is deactivated, but not hidden, upon explosion. */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Projectile)
-	UParticleSystemComponent* TrailParticleComp;
+	class UParticleSystemComponent* TrailParticleComp;
 
 	/** controller that fired me (cache for damage calculations). 
 	*	Use this to determine damage instigator, rather than GetInstigatorController, because instigator's controller is NULL when pawn dies (and the projectile may still damage players). */
 	UPROPERTY(BlueprintReadOnly, Category = Projectile, Meta = (Keywords = "instigator"))
-	TWeakObjectPtr<AController> MyController;
+	TWeakObjectPtr<class AController> MyController;
 
 	/** did it explode? */
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing=OnRep_Exploded, Category=Projectile)
@@ -138,5 +140,5 @@ protected:
 	FTimerHandle StopIgnoringInstigatorHandle;
 
 	/** reference to the level's DirectionalLight */
-	ADirectionalLight* Sun;
+	class ADirectionalLight* Sun;
 };

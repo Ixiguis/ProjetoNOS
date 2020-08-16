@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Object.h"
 #include "ShooterMessageHandler.generated.h"
 
 UENUM()

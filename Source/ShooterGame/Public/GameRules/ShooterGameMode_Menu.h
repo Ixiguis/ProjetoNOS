@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
+#include "ShooterTypes.h"
 #include "ShooterGameMode_Menu.generated.h"
 
 /**
@@ -30,7 +31,7 @@ protected:
 
 	/** game mode aliases (CTF, DM, etc.) */
 	UPROPERTY(config)
-	TArray<struct FGameModeInfo> GameModeList;
+	TArray<FGameModeInfo> GameModeList;
 	
 	
 };

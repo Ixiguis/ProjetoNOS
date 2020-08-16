@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ShooterItem.h"
+#include "Items/ShooterItem.h"
 #include "ShooterItem_Ammo.generated.h"
 
 UCLASS()
@@ -14,7 +14,7 @@ class AShooterItem_Ammo : public AShooterItem
 public:
 	AShooterItem_Ammo();
 
-	void InitializeAmmo(TSubclassOf<AShooterWeapon> InWeaponClass, int32 Amount = -1);
+	void InitializeAmmo(TSubclassOf<class AShooterWeapon> InWeaponClass, int32 Amount = -1);
 
 	/** @return the amount of ammo added. */
 	int32 AddAmmo(int AddAmount);
@@ -28,7 +28,7 @@ public:
 
 	/** which weapon this ammo serves */
 	UPROPERTY(Replicated)
-	TSubclassOf<AShooterWeapon> WeaponClass;
+	TSubclassOf<class AShooterWeapon> WeaponClass;
 	
 private:
 	/** current ammo */

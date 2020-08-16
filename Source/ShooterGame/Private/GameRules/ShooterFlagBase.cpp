@@ -1,7 +1,8 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved. 
 
 #include "GameRules/ShooterFlagBase.h"
-
+#include "Components/BillboardComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 AShooterFlagBase::AShooterFlagBase()
 {

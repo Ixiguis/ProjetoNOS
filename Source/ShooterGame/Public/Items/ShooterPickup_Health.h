@@ -1,6 +1,7 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
+#include "Items/ShooterPickup.h"
 #include "ShooterPickup_Health.generated.h"
 
 // A pickup object that replenishes character health

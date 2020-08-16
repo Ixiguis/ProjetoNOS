@@ -3,9 +3,12 @@
 
 #pragma once
 
+#include "GameFramework/GameState.h"
 #include "Player/ShooterPlayerState.h"
 #include "UI/ShooterMessageHandler.h"
 #include "ShooterGameState.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogShooterGameState, Log, All);
 
 /** ranked PlayerState map, created from the GameState */
 typedef TMap<int32, TWeakObjectPtr<AShooterPlayerState> > RankedPlayerMap; 

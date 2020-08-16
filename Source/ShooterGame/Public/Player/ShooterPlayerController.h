@@ -2,8 +2,13 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 #pragma once
+
+#include "GameFramework/PlayerController.h"
 #include "Online.h"
 #include "ShooterTypes.h"
+#include "Weapons/ShooterWeapon.h"
+#include "Weapons/ShooterDamageType.h"
+#include "UI/ShooterMessageHandler.h"
 #include "Player/ShooterControllerInterface.h"
 #include "ShooterPlayerController.generated.h"
 
@@ -103,7 +108,7 @@ public:
 // 	virtual void Emote(const FString& Msg);
 
 	/** notify local client about deaths */
-	void OnDeathMessage(class AShooterPlayerState* KillerPlayerState, class AShooterPlayerState* KilledPlayerState, TSubclassOf<class AShooterWeapon> KillerWeaponClass, TSubclassOf<class UShooterDamageType> KillerDmgType);
+	void OnDeathMessage(class AShooterPlayerState* KillerPlayerState, class AShooterPlayerState* KilledPlayerState, TSubclassOf<AShooterWeapon> KillerWeaponClass, TSubclassOf<UShooterDamageType> KillerDmgType);
 
 	/** set infinite ammo cheat */
 	UFUNCTION(BlueprintCallable, Category=Cheats)
@@ -260,9 +265,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Controller")
 	void CrosshairChanged(UTexture2D* NewCrosshair);
 
-
-	AShooterPlayerState* GetShooterPlayerState() const;
-
 	/** Sends a physic body's data to the client, to keep it in sync with the server. */
 	UFUNCTION(Client, Unreliable)
 	void ClientUpdatePhysicsBody(UPrimitiveComponent* PhysBody, const FVector_NetQuantize& Loc, const FVector_NetQuantize& LinearVel, const FVector_NetQuantize& AngularVel, const FQuat& Rot);
@@ -385,8 +387,3 @@ protected:
 	void AddLocalPlayer();
 	void RemoveLocalPlayer();
 };
-
-FORCEINLINE AShooterPlayerState* AShooterPlayerController::GetShooterPlayerState() const
-{
-	return GetPlayerState<AShooterPlayerState>();
-}

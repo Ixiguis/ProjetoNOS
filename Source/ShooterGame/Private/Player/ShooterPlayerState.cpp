@@ -1,9 +1,16 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPlayerState.h"
-#include "TimerManager.h"
-
+#include "Player/ShooterPlayerState.h"
+#include "Player/ShooterPlayerController.h"
+#include "Player/ShooterCharacter.h"
+#include "Player/ShooterLocalPlayer.h"
+#include "Player/ShooterPersistentUser.h"
+#include "Player/ShooterSpectatorPawn.h"
+#include "GameRules/ShooterGameState.h"
+#include "GameRules/ShooterGameMode.h"
+#include "Net/UnrealNetwork.h"
+#include "AI/ShooterAIController.h"
 
 AShooterPlayerState::AShooterPlayerState()
 {

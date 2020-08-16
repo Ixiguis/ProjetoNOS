@@ -1,8 +1,11 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPickup_Weapon.h"
-#include "ShooterWeapon.h"
+#include "Items/ShooterPickup_Weapon.h"
+#include "Weapons/ShooterWeapon.h"
+#include "FunctionLibraries/ShooterBlueprintLibrary.h"
+#include "GameRules/ShooterGameMode.h"
+#include "Player/ShooterCharacter.h"
 
 #define LOCTEXT_NAMESPACE "ShooterGame.Pickup"
 
@@ -38,7 +41,7 @@ void AShooterPickup_Weapon::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AShooterPickup_Weapon::GivePickupTo(class AShooterCharacter* Pawn)
+void AShooterPickup_Weapon::GivePickupTo(AShooterCharacter* Pawn)
 {
 	const int32 AmmoAmount = overrideAmmoAmount > -1? overrideAmmoAmount : Cast<AShooterWeapon>(WeaponClass->GetDefaultObject())->GetInitialAmmo();
 	if (Pawn && GetLocalRole() == ROLE_Authority)

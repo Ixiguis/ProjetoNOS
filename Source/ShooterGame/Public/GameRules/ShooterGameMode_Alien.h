@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "GameRules/ShooterGameMode_Arena.h"
 #include "GameRules/ShooterGameMode_TeamDeathMatch.h"
 #include "ShooterGameMode_Alien.generated.h"
 

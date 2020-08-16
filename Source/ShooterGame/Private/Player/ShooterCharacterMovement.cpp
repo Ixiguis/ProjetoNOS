@@ -1,7 +1,11 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterCharacterMovement.h"
+#include "Player/ShooterCharacterMovement.h"
+#include "Player/ShooterCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 UShooterCharacterMovement::UShooterCharacterMovement()
 {

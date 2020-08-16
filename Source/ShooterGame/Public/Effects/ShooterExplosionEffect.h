@@ -1,5 +1,6 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
+#pragma once
 
 #include "ShooterTypes.h"
 #include "ShooterExplosionEffect.generated.h"
@@ -19,11 +20,11 @@ public:
 
 	/** explosion FX */
 	UPROPERTY(EditDefaultsOnly, Category=Effect)
-	UParticleSystem* ExplosionFX;
+	class UParticleSystem* ExplosionFX;
 
 	/** explosion light */
 	UPROPERTY(VisibleDefaultsOnly, Category=Effect)
-	UPointLightComponent* ExplosionLight;
+	class UPointLightComponent* ExplosionLight;
 
 	/** how long keep explosion light on? */
 	UPROPERTY(EditDefaultsOnly, Category=Effect)
@@ -31,7 +32,7 @@ public:
 
 	/** explosion sound */
 	UPROPERTY(EditDefaultsOnly, Category=Effect)
-	USoundCue* ExplosionSound;
+	class USoundCue* ExplosionSound;
 	
 	/** explosion decals */
 	UPROPERTY(EditDefaultsOnly, Category=Effect)

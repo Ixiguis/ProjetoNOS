@@ -23,14 +23,14 @@ public:
 	bool IsAtBase() const;
 
 	/** Taker takes the flag, and attaches the flag to Taker. Returns true if the flag was successfully taken. */
-	bool TakeFlag(AShooterCharacter* Taker);
+	bool TakeFlag(class AShooterCharacter* Taker);
 
 	void ReturnFlag();
 	void DropFlag();
 	
 	void SetFlagBase(class AShooterFlagBase* TheBase);
 
-	inline AShooterCharacter* GetFlagCarrier() const { return FlagCarrier; }
+	class AShooterCharacter* GetFlagCarrier() const;
 
 	/** if true then this flag was dropped, otherwise it's at base (if FlagCarrier == NULL) or carried by someone */
 	UPROPERTY(Replicated)
@@ -46,16 +46,16 @@ protected:
 	uint8 TeamNumber;
 	
 	UPROPERTY(Replicated)
-	AShooterCharacter* FlagCarrier;
+	class AShooterCharacter* FlagCarrier;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Flag)
-	UCapsuleComponent* CollisionComp;
+	class UCapsuleComponent* CollisionComp;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Flag)
-	UStaticMeshComponent* MeshComp;
+	class UStaticMeshComponent* MeshComp;
 
 	/** this flag's base */
-	AShooterFlagBase* MyFlagBase;
+	class AShooterFlagBase* MyFlagBase;
 
 	float LastReturnTime;
 

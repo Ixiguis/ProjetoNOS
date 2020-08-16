@@ -2,6 +2,7 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
 #include "ShooterTypes.h"
+#include "GameFramework/Actor.h"
 #include "ShooterImpactEffect.generated.h"
 
 //
@@ -19,75 +20,75 @@ public:
 
 	/** default impact FX used when material specific override doesn't exist */
 	UPROPERTY(EditDefaultsOnly, Category=Defaults)
-	UParticleSystem* DefaultFX;
+	class UParticleSystem* DefaultFX;
 
 	/** impact FX on concrete */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* ConcreteFX;
+	class UParticleSystem* ConcreteFX;
 
 	/** impact FX on dirt */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* DirtFX;
+	class UParticleSystem* DirtFX;
 
 	/** impact FX on water */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* WaterFX;
+	class UParticleSystem* WaterFX;
 
 	/** impact FX on metal */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* MetalFX;
+	class UParticleSystem* MetalFX;
 
 	/** impact FX on wood */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* WoodFX;
+	class UParticleSystem* WoodFX;
 
 	/** impact FX on glass */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* GlassFX;
+	class UParticleSystem* GlassFX;
 
 	/** impact FX on grass */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* GrassFX;
+	class UParticleSystem* GrassFX;
 
 	/** impact FX on flesh */
 	UPROPERTY(EditDefaultsOnly, Category=Visual)
-	UParticleSystem* FleshFX;
+	class UParticleSystem* FleshFX;
 
 	/** default impact sound used when material specific override doesn't exist */
 	UPROPERTY(EditDefaultsOnly, Category=Defaults)
-	USoundCue* DefaultSound;
+	class USoundCue* DefaultSound;
 
 	/** impact FX on concrete */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* ConcreteSound;
+	class USoundCue* ConcreteSound;
 
 	/** impact FX on dirt */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* DirtSound;
+	class USoundCue* DirtSound;
 
 	/** impact FX on water */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* WaterSound;
+	class USoundCue* WaterSound;
 
 	/** impact FX on metal */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* MetalSound;
+	class USoundCue* MetalSound;
 
 	/** impact FX on wood */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* WoodSound;
+	class USoundCue* WoodSound;
 
 	/** impact FX on glass */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* GlassSound;
+	class USoundCue* GlassSound;
 
 	/** impact FX on grass */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* GrassSound;
+	class USoundCue* GrassSound;
 
 	/** impact FX on flesh */
 	UPROPERTY(EditDefaultsOnly, Category=Sound)
-	USoundCue* FleshSound;
+	class USoundCue* FleshSound;
 
 	/** default decal when material specific override doesn't exist */
 	UPROPERTY(EditDefaultsOnly, Category=Defaults)

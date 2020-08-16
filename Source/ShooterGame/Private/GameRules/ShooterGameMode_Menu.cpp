@@ -1,8 +1,8 @@
 // Copyright 2013-2014 Rampaging Blue Whale Games. All rights reserved.
 
-#include "ShooterGameMode_Menu.h"
-#include "ShooterGameSession.h"
-#include "ShooterPlayerController_Menu.h"
+#include "GameRules/ShooterGameMode_Menu.h"
+#include "GameRules/ShooterGameSession.h"
+#include "Player/ShooterPlayerController_Menu.h"
 
 
 AShooterGameMode_Menu::AShooterGameMode_Menu()

@@ -1,7 +1,9 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterPickup_Powerup.h"
+#include "Items/ShooterPickup_Powerup.h"
+#include "Items/ShooterItem_Powerup.h"
+#include "Player/ShooterCharacter.h"
 
 #define LOCTEXT_NAMESPACE "ShooterGame.Pickup"
 
@@ -11,7 +13,7 @@ AShooterPickup_Powerup::AShooterPickup_Powerup()
 	SpawnAtGameStart = false;
 }
 
-bool AShooterPickup_Powerup::CanBePickedUp(class AShooterCharacter* TestPawn)
+bool AShooterPickup_Powerup::CanBePickedUp(AShooterCharacter* TestPawn)
 {
 	if (TestPawn && TestPawn->AnyPowerupActive)
 	{
@@ -20,7 +22,7 @@ bool AShooterPickup_Powerup::CanBePickedUp(class AShooterCharacter* TestPawn)
 	return Super::CanBePickedUp(TestPawn);
 }
 
-void AShooterPickup_Powerup::GivePickupTo(class AShooterCharacter* Pawn)
+void AShooterPickup_Powerup::GivePickupTo(AShooterCharacter* Pawn)
 {
 	if (Pawn && GetLocalRole() == ROLE_Authority)
 	{

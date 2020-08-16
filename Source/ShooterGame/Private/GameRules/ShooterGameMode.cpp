@@ -1,10 +1,25 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "ShooterGameMode.h"
-#include "ShooterSpectatorPawn.h"
-#include "ShooterGameSession.h"
+#include "GameRules/ShooterGameMode.h"
+#include "Player/ShooterSpectatorPawn.h"
+#include "Player/ShooterPlayerController.h"
+#include "Player/ShooterPlayerState.h"
+#include "ShooterGameUserSettings.h"
+#include "GameRules/ShooterGameState.h"
+#include "GameRules/ShooterGameSession.h"
+#include "AI/ShooterAIController.h"
+#include "AI/ShooterMonsterController.h"
 #include "ShooterTeamStart.h"
+#include "ShooterGameUserSettings.h"
+#include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
+#include "Engine/PlayerStartPIE.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Player/ShooterCharacter.h"
+#include "Components/CapsuleComponent.h"
+
+DEFINE_LOG_CATEGORY(LogShooterGameMode);
 
 AShooterGameMode::AShooterGameMode(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

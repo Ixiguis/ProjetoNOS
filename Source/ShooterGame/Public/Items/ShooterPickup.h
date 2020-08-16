@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "GameFramework/Actor.h"
+#include "Engine/Canvas.h"
 #include "ShooterPickup.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBindableEvent_PickupPickedup, AShooterPickup*, Pickup);
@@ -37,7 +39,7 @@ public:
 	uint32 bIsActive:1;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Collision)
-	UProjectileMovementComponent* MovementComp;
+	class UProjectileMovementComponent* MovementComp;
 	
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void SetVelocity(FVector_NetQuantize10 NewVelocity);
@@ -63,18 +65,18 @@ public:
 protected:
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Collision)
-	UCapsuleComponent* CollisionComp;
+	class UCapsuleComponent* CollisionComp;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Pickup)
-	USkeletalMeshComponent* PickupMeshComp;
+	class USkeletalMeshComponent* PickupMeshComp;
 
 	/** FX component */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category=Effects)
-	UParticleSystemComponent* PickupPSC;
+	class UParticleSystemComponent* PickupPSC;
 	
 	/** FX of active pickup */
 	UPROPERTY(EditAnywhere, Category=Effects)
-	UParticleSystem* ActiveFX;
+	class UParticleSystem* ActiveFX;
 	
 	/** If true, this pickup will simulate physics (will fall until it hits the ground). */
 	UPROPERTY(EditAnywhere, Category = Effects)
@@ -82,15 +84,15 @@ protected:
 
 	/** FX of pickup on respawn timer */
 	UPROPERTY(EditAnywhere, Category=Effects)
-	UParticleSystem* RespawningFX;
+	class UParticleSystem* RespawningFX;
 
 	/** sound played when player picks it up */
 	UPROPERTY(EditAnywhere, Category=Effects)
-	USoundCue* PickupSound;
+	class USoundCue* PickupSound;
 
 	/** sound played on respawn */
 	UPROPERTY(EditAnywhere, Category=Effects)
-	USoundCue* RespawnSound;
+	class USoundCue* RespawnSound;
 	
 	/** if false, this pickup will spawn only after its RespawnTime, on match start */
 	UPROPERTY(EditAnywhere, Category=Pickup)
@@ -107,7 +109,7 @@ protected:
 
 	/* The character who has picked up this pickup */
 	UPROPERTY(Transient)
-	AShooterCharacter* PickedUpBy;
+	class AShooterCharacter* PickedUpBy;
 
 	UFUNCTION()
 	void OnRep_IsActive();

@@ -2,7 +2,9 @@
 
 #include "GameRules/ShooterFlag.h"
 #include "GameRules/ShooterFlagBase.h"
-
+#include "Player/ShooterCharacter.h"
+#include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AShooterFlag::AShooterFlag()
 {
@@ -102,4 +104,9 @@ void AShooterFlag::SetFlagBase(AShooterFlagBase* TheBase)
 {
 	MyFlagBase = TheBase;
 	TeamNumber = TheBase->TeamNumber;
+}
+
+AShooterCharacter* AShooterFlag::GetFlagCarrier() const
+{
+	return FlagCarrier;
 }
