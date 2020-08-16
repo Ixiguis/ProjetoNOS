@@ -1,8 +1,8 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 // Copyright 2013-2014 Rampaging Blue Whale Games. All Rights Reserved.
 
-#include "Effects/ShooterImpactEffect.h"
 #include "Weapons/ShooterWeapon.h"
+#include "Effects/ShooterImpactEffect.h"
 #include "Weapons/ShooterProjectile.h"
 #include "GameRules/ShooterGameState.h"
 #include "GameFramework/ForceFeedbackEffect.h"

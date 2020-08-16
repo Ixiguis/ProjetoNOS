@@ -366,7 +366,7 @@ public:
 
 	/** gets the duration of equipping weapon*/
 	float GetEquipDuration() const;
-	
+		
 	/** set the weapon's owning pawn */
 	void SetOwningPawn(AShooterCharacter* AShooterCharacter);
 	

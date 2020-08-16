@@ -9,7 +9,7 @@ public class ShooterGame : ModuleRules
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         bEnforceIWYU = true;
-        bFasterWithoutUnity = true;
+        bUseUnity = true;
 
 		PrivateIncludePaths.AddRange(
 			new string[] {
@@ -26,8 +26,6 @@ public class ShooterGame : ModuleRules
 				"Engine",
 				"OnlineSubsystem",
 				"OnlineSubsystemUtils",
-				"AssetRegistry",
-				"RHI",
                 "AIModule",
                 "GameplayTasks",
                 "Json",
@@ -40,22 +38,6 @@ public class ShooterGame : ModuleRules
                 "InputCore",
 			}
 		);
-        
-        DynamicallyLoadedModuleNames.AddRange(
-            new string[] {
-                "OnlineSubsystemNull",
-                "NetworkReplayStreaming",
-				"NullNetworkReplayStreaming",
-				"HttpNetworkReplayStreaming",
-				"LocalFileNetworkReplayStreaming"
-            }
-        );
-
-        PrivateIncludePathModuleNames.AddRange(
-            new string[] {
-                "NetworkReplayStreaming"
-            }
-        );
 
         if (Target.bBuildEditor == true)
         {
