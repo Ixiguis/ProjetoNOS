@@ -69,10 +69,6 @@ public:
 	UFUNCTION(BlueprintPure, Category=PlayerState)
 	bool IsQuitter() const;
 
-	/** gets truncated player name to fit in death log and scoreboards */
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
-	FString GetShortPlayerName() const;
-
 	/** Sends kill (excluding self) to clients */
 	UFUNCTION(Reliable, Client)
 	void InformAboutKill(class AShooterPlayerState* KillerPlayerState, class AShooterPlayerState* KilledPlayerState);

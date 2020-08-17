@@ -73,6 +73,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = GameState)
 	TSubclassOf<class UShooterMessageHandler> MessageHandlerClass;
 
+	//Begin AGameStateBase interface
+	virtual void AddPlayerState(APlayerState* PlayerState) override;
+	virtual void RemovePlayerState(APlayerState* PlayerState) override;
+	//End AGameStateBase interface
+
 public:
 
 	UFUNCTION(BlueprintPure, Category = GameState)

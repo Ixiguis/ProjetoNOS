@@ -239,6 +239,28 @@ void AShooterGameState::RequestFinishAndExitToMainMenu()
 	}
 }
 
+void AShooterGameState::AddPlayerState(APlayerState* PlayerState)
+{
+	Super::AddPlayerState(PlayerState);
+	//send a notify to the local player controller
+	AShooterPlayerController* PC = GetWorld()->GetFirstPlayerController<AShooterPlayerController>();
+	if (PC)
+	{
+		PC->NotifyPlayerJoinedGame(PlayerState);
+	}
+}
+
+void AShooterGameState::RemovePlayerState(APlayerState* PlayerState)
+{
+	Super::RemovePlayerState(PlayerState);
+	//send a notify to the local player controller
+	AShooterPlayerController* PC = GetWorld()->GetFirstPlayerController<AShooterPlayerController>();
+	if (PC)
+	{
+		PC->NotifyPlayerLeftGame(PlayerState);
+	}
+}
+
 int32 AShooterGameState::GetTeamScore(uint8 TeamNum) const
 {
 	return TeamScores[TeamNum];

@@ -244,6 +244,14 @@ public:
 	virtual bool IsEnemyFor(AController* TestPC) const;
 	// End IShooterControllerInterface
 
+	/** [everyone] called when a player joins the game */
+	UFUNCTION(BlueprintImplementableEvent, Category = Pickup)
+	void NotifyPlayerJoinedGame(class APlayerState* NewPlayerState);
+
+	/** [everyone] called when a player leaves the game */
+	UFUNCTION(BlueprintImplementableEvent, Category = Pickup)
+	void NotifyPlayerLeftGame(class APlayerState* LeavingPlayerState);
+
 	virtual void ToggleSpeaking(bool bSpeaking);
 
 	/** Reads the UserSettings for chat option, and registers or unregisters the voice interface. */

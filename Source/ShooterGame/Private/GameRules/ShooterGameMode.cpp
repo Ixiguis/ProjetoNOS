@@ -319,7 +319,7 @@ void AShooterGameMode::CheckAndNotifyAchievements(AController* Killer, AControll
 	AShooterPlayerState* KillerPS = Killer ? Killer->GetPlayerState<AShooterPlayerState>() : NULL;
 	if (KillerPS)
 	{
-		KillerName = KillerPS->GetShortPlayerName();	
+		KillerName = KillerPS->GetPlayerName();	
 	}
 	else
 	{
@@ -329,7 +329,7 @@ void AShooterGameMode::CheckAndNotifyAchievements(AController* Killer, AControll
 	AShooterPlayerState* VictimPS = KilledPlayer ? KilledPlayer->GetPlayerState<AShooterPlayerState>() : NULL;
 	if (VictimPS)
 	{
-		VictimName = VictimPS->GetShortPlayerName();
+		VictimName = VictimPS->GetPlayerName();
 	}
 	else
 	{
@@ -726,7 +726,7 @@ void AShooterGameMode::MessagePlayers(TEnumAsByte<EMessageTypes::Type> MessageTy
 	const AShooterPlayerState* InstigatorPS = MessageInstigator ? MessageInstigator->GetPlayerState<AShooterPlayerState>() : NULL;
 	if (InstigatorPS)
 	{
-		InstigatorName = InstigatorPS->GetShortPlayerName();
+		InstigatorName = InstigatorPS->GetPlayerName();
 	}
 	else
 	{
@@ -735,7 +735,7 @@ void AShooterGameMode::MessagePlayers(TEnumAsByte<EMessageTypes::Type> MessageTy
 	const AShooterPlayerState* InstigatedPS = Instigated ? Instigated->GetPlayerState<AShooterPlayerState>() : NULL;
 	if (InstigatedPS)
 	{
-		InstigatedName = InstigatedPS->GetShortPlayerName();
+		InstigatedName = InstigatedPS->GetPlayerName();
 	}
 	else
 	{

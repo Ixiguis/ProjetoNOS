@@ -37,7 +37,7 @@ static void WebServerDelegate(int32 UserIndex, const FString& Action, const FStr
 						{
 							ScoreboardStr += TEXT(" ,");
 						}
-						ScoreboardStr += FString::Printf(TEXT(" { \"n\" : \"%s\" , \"k\" : \"%d\" , \"d\" : \"%d\" }"), *PlayerState->GetShortPlayerName(), PlayerState->GetKills(), PlayerState->GetDeaths());
+						ScoreboardStr += FString::Printf(TEXT(" { \"n\" : \"%s\" , \"k\" : \"%d\" , \"d\" : \"%d\" }"), *PlayerState->GetPlayerName().Left(30), PlayerState->GetKills(), PlayerState->GetDeaths());
 						bNeedsComma = true;
 					}
 				}

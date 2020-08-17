@@ -305,15 +305,6 @@ void AShooterPlayerState::GetLifetimeReplicatedProps( TArray< FLifetimeProperty 
 	DOREPLIFETIME(AShooterPlayerState, LivesRemaining);
 }
 
-FString AShooterPlayerState::GetShortPlayerName() const
-{
-	if (GetPlayerName().Len() > MAX_PLAYER_NAME_LENGTH)
-	{
-		return GetPlayerName().Left(MAX_PLAYER_NAME_LENGTH) + "...";
-	}
-	return GetPlayerName();
-}
-
 void AShooterPlayerState::RestartPlayer()
 {
 	KillsSinceLastDeath = 0;
