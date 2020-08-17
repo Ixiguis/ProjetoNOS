@@ -17,31 +17,31 @@ public:
 	AShooterGameState_Invasion();
 
 	/** number of teams in current game */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	int32 RemainingMonsters;
 
 	/** number of teams in current game */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	int32 TotalMonstersSpawned;
 
 	/** current (or upcoming) wave number */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	uint8 CurrentWave;
 
 	/** total number of waves */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	uint8 TotalWaves;
 
 	/** maximum number of monsters for current wave */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	uint8 MaxMonsters;
 
 	/** Invasion warm-up time remaining, or time remaining for current wave */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	int32 InvasionRemainingTime;
 	
 	/** true: wave in progress, monsters are spawning. False: invasion warm-up */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Category = GameState, Transient, Replicated)
 	bool bWaveInProgress;
 
 };

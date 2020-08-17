@@ -18,7 +18,7 @@ public:
 	AShooterItem_Powerup();
 
 	/** item's duration when activated. Replicated only to owner. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Replicated, Category=Powerup)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category=Powerup)
 	float Duration;
 	
 	/** Sets TimerUp() timer, and plays DurationSound. Then calls ActivatedEvent.
@@ -31,8 +31,8 @@ public:
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation, Category=Powerup)
 	void Deactivate();
 
-	UFUNCTION(BlueprintCallable,  Category=Powerup)
-	float GetRemainingDuration();
+	UFUNCTION(BlueprintPure,  Category=Powerup)
+	float GetRemainingDuration() const;
 
 	bool IsActive();
 

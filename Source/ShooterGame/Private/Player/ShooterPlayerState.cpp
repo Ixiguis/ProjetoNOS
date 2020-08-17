@@ -17,8 +17,6 @@ AShooterPlayerState::AShooterPlayerState()
 	TeamNumber = 0;
 	NumKills = 0;
 	NumDeaths = 0;
-	NumBulletsFired = 0;
-	NumRocketsFired = 0;
 	bQuitter = false;
 	KillsSinceLastDeath = 0;
 	LastKillTime = -MAX_FLT;
@@ -39,8 +37,6 @@ void AShooterPlayerState::Reset()
 	//SetTeamNum(0);
 	NumKills = 0;
 	NumDeaths = 0;
-	NumBulletsFired = 0;
-	NumRocketsFired = 0;
 	KillsSinceLastDeath = 0;
 	LastKillTime = -MAX_FLT;
 	MultiKills = 1;
@@ -117,16 +113,6 @@ void AShooterPlayerState::ServerSetTeamNum_Implementation(int32 NewTeamNumber)
 	{
 		ShooterCharacter->Suicide();
 	}
-}
-
-void AShooterPlayerState::AddBulletsFired(int32 NumBullets)
-{
-	NumBulletsFired += NumBullets;
-}
-
-void AShooterPlayerState::AddRocketsFired(int32 NumRockets)
-{
-	NumRocketsFired += NumRockets;
 }
 
 void AShooterPlayerState::SetQuitter(bool bInQuitter)
@@ -221,16 +207,6 @@ int32 AShooterPlayerState::GetDeaths() const
 int32 AShooterPlayerState::GetSuicides() const
 {
 	return NumSuicides;
-}
-
-int32 AShooterPlayerState::GetNumBulletsFired() const
-{
-	return NumBulletsFired;
-}
-
-int32 AShooterPlayerState::GetNumRocketsFired() const
-{
-	return NumRocketsFired;
 }
 
 bool AShooterPlayerState::IsQuitter() const

@@ -50,29 +50,23 @@ public:
 	void ScoreSuicide(int32 Points);
 	
 	/** get current team */
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
+	UFUNCTION(BlueprintPure, Category=PlayerState)
 	int32 GetTeamNum() const;
 
 	/** get number of kills */
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
+	UFUNCTION(BlueprintPure, Category=PlayerState)
 	int32 GetKills() const;
 
 	/** get number of deaths */
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
+	UFUNCTION(BlueprintPure, Category=PlayerState)
 	int32 GetDeaths() const;
 	
 	/** get number of deaths */
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
+	UFUNCTION(BlueprintPure, Category=PlayerState)
 	int32 GetSuicides() const;
 
-	/** get number of bullets fired this match */
-	int32 GetNumBulletsFired() const;
-
-	/** get number of rockets fired this match */
-	int32 GetNumRocketsFired() const;
-	
 	/** get whether the player quit the match */
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
+	UFUNCTION(BlueprintPure, Category=PlayerState)
 	bool IsQuitter() const;
 
 	/** gets truncated player name to fit in death log and scoreboards */
@@ -99,17 +93,14 @@ public:
 
 	FLinearColor GetColor(uint8 ColorIndex) const;
 	inline int32 GetNumColors() const { return PlayerColors.Num(); } 
-
-	//We don't need stats about amount of ammo fired to be server authenticated, so just increment these with local functions
-	void AddBulletsFired(int32 NumBullets);
-	void AddRocketsFired(int32 NumRockets);
-	
+		
 	/** Set whether the player is a quitter */
 	UFUNCTION(BlueprintCallable, Category=PlayerState)
 	void SetQuitter(bool bInQuitter);
 
 	virtual void CopyProperties(class APlayerState* PlayerState) override;
 
+	UFUNCTION(BlueprintPure, Category = PlayerState)
 	inline bool HasLivesRemaining() const { return LivesRemaining != 0; }
 
 	/** reduces LivesRemaining by 1, unless player has infinite lives (-1) */
@@ -118,10 +109,13 @@ public:
 	/** sets this player's lives remaining */
 	inline void SetLives(int32 NewLives) { LivesRemaining = NewLives; }
 
-	UFUNCTION(BlueprintCallable, Category=PlayerState)
+	UFUNCTION(BlueprintPure, Category=PlayerState)
 	int32 GetLivesRemaining() const;
 
+	UFUNCTION(BlueprintPure, Category = PlayerState)
 	inline uint8 GetMultiKills() const { return MultiKills; }
+
+	UFUNCTION(BlueprintPure, Category = PlayerState)
 	inline uint8 GetKillsSinceLastDeath() const { return KillsSinceLastDeath; }
 
 	/** call this when the player spawns, this will reset their killing spree counter */
@@ -155,14 +149,6 @@ protected:
 	/** number of kills */
 	UPROPERTY(Transient, Replicated)
 	int32 NumSuicides;
-	
-	/** number of bullets fired this match */
-	UPROPERTY()
-	int32 NumBulletsFired;
-
-	/** number of rockets fired this match */
-	UPROPERTY()
-	int32 NumRocketsFired;
 	
 	/** whether the user quit the match */
 	UPROPERTY()

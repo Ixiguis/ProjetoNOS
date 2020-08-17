@@ -18,9 +18,6 @@ AShooterGameState::AShooterGameState()
 	bTimerPaused = false;
 	bChangeToTeamColors = false;
 	bPlayersAddTeamScore = true;
-	//bReplicates = true;
-	//bAlwaysRelevant = true;
-	//SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	
 	static ConstructorHelpers::FClassFinder<UShooterMessageHandler> MsgHandlerOb(TEXT("/Game/UI/MessageHandler.MessageHandler_C"));
 	MessageHandlerClass = MsgHandlerOb.Class;
@@ -57,10 +54,8 @@ void AShooterGameState::GetLifetimeReplicatedProps( TArray< FLifetimeProperty > 
 	DOREPLIFETIME_CONDITION(AShooterGameState, bPlayersAddTeamScore, COND_InitialOnly);
 }
 
-void AShooterGameState::GetRankedMap(int32 TeamIndex, RankedPlayerMap& OutRankedMap) const
+TArray<AShooterPlayerState*>  AShooterGameState::GetRankedPlayerArray(int32 TeamIndex) const
 {
-	OutRankedMap.Empty();
-
 	//first, we need to go over all the PlayerStates, grab their score, and rank them
 	TMultiMap<int32, AShooterPlayerState*> SortedMap;
 	for(int32 i = 0; i < PlayerArray.Num(); ++i)
@@ -76,20 +71,18 @@ void AShooterGameState::GetRankedMap(int32 TeamIndex, RankedPlayerMap& OutRanked
 	//sort by the keys
 	SortedMap.KeySort(TGreater<int32>());
 
-	//now, add them back to the ranked map
-	OutRankedMap.Empty();
-
-	int32 Rank = 0;
+	//now, add them a ranked array
+	TArray<AShooterPlayerState*> RankedArray;
 	for(TMultiMap<int32, AShooterPlayerState*>::TIterator It(SortedMap); It; ++It)
 	{
-		OutRankedMap.Add(Rank++, It.Value());
-	}
-	
+		RankedArray.Add( It.Value());
+	}	
+	return RankedArray;
 }
 
 void AShooterGameState::AddTeamScore(uint8 TeamNumber, int32 ScoreToAdd)
 {
-	if (TeamNumber >= 0)
+	if (TeamNumber >= 0 && TeamNumber < NumTeams)
 	{
 		TeamScores[TeamNumber] += ScoreToAdd;
 	}
@@ -97,7 +90,7 @@ void AShooterGameState::AddTeamScore(uint8 TeamNumber, int32 ScoreToAdd)
 
 void AShooterGameState::SetTeamScore(uint8 TeamNumber, int32 NewScoe)
 {
-	if (TeamNumber >= 0)
+	if (TeamNumber >= 0 && TeamNumber < NumTeams)
 	{
 		TeamScores[TeamNumber] = NewScoe;
 	}
@@ -134,10 +127,10 @@ int32 AShooterGameState::GetPlayerPosition(AShooterPlayerState * Player) const
 	{
 		return 0;
 	}
-	RankedPlayerMap PlayerStateMap;
+	TArray<AShooterPlayerState*> PlayersRanked;
 	const uint8 MyTeam = Player->GetTeamNum();
-	GetRankedMap(MyTeam, PlayerStateMap);
-	int32 MyPos = *PlayerStateMap.FindKey(Player) + 1;
+	PlayersRanked = GetRankedPlayerArray(MyTeam);
+	const int32 MyPos = PlayersRanked.Find(Player) + 1;
 	return MyPos;
 }
 
@@ -166,8 +159,7 @@ int32 AShooterGameState::GetNumberOfPlayers(int32 Team) const
 	{
 		return PlayerArray.Num();
 	}
-	RankedPlayerMap PlayerStateMap;
-	GetRankedMap(Team, PlayerStateMap);
+	TArray<AShooterPlayerState*> PlayerStateMap = GetRankedPlayerArray(Team);
 	return PlayerStateMap.Num();
 }
 

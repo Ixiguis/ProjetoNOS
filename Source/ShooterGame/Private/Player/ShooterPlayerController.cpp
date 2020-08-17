@@ -190,7 +190,7 @@ void AShooterPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIs
 			UShooterPersistentUser* const PersistentUser = GetPersistentUser();
 			if (PersistentUser)
 			{
-				PersistentUser->AddMatchResult( ShooterPlayerState->GetKills(), ShooterPlayerState->GetDeaths(), ShooterPlayerState->GetSuicides(), ShooterPlayerState->GetNumBulletsFired(), ShooterPlayerState->GetNumRocketsFired(), bIsWinner);
+				PersistentUser->AddMatchResult( ShooterPlayerState->GetKills(), ShooterPlayerState->GetDeaths(), ShooterPlayerState->GetSuicides(), bIsWinner);
 				PersistentUser->SaveIfDirty();
 			}
 
@@ -836,9 +836,6 @@ void AShooterPlayerController::UpdateAchievementsOnGameEnd()
 				const int32 TotalKills = PersistentUser->GetKills();
 				const int32 MatchScore = (int32)ShooterPlayerState->GetScore();
 
-				const int32 TotalBulletsFired = PersistentUser->GetBulletsFired();
-				const int32 TotalRocketsFired = PersistentUser->GetRocketsFired();
-			
 				float TotalGameAchievement = 0;
 				float CurrentGameAchievement = 0;
 			
@@ -917,25 +914,6 @@ void AShooterPlayerController::UpdateAchievementsOnGameEnd()
 				}
 				///////////////////////////////////////
 
-				///////////////////////////////////////
-				// Ammo Achievements
-				{
-					float fLotsBulletsPct = ((float)TotalBulletsFired / (float)LotsBulletsCount) * 100.0f;
-					fLotsBulletsPct = FMath::RoundToFloat(fLotsBulletsPct);
-					UpdateAchievementProgress(ACH_SHOOT_BULLETS, fLotsBulletsPct);
-
-					CurrentGameAchievement += FMath::Min(fLotsBulletsPct, 100.0f);
-					TotalGameAchievement += 100;
-				}
-
-				{
-					float fLotsRocketsPct = ((float)TotalRocketsFired / (float)LotsRocketsCount) * 100.0f;
-					fLotsRocketsPct = FMath::RoundToFloat(fLotsRocketsPct);
-					UpdateAchievementProgress(ACH_SHOOT_ROCKETS, fLotsRocketsPct);
-
-					CurrentGameAchievement += FMath::Min(fLotsRocketsPct, 100.0f);
-					TotalGameAchievement += 100;
-				}
 				///////////////////////////////////////
 
 				///////////////////////////////////////

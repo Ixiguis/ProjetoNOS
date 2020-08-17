@@ -999,7 +999,7 @@ AShooterItem* AShooterCharacter::FindItem(TSubclassOf<AShooterItem> ItemClass) c
 	return nullptr;
 }
 
-AShooterItem_Powerup* AShooterCharacter::GetFirstPowerup()
+AShooterItem_Powerup* AShooterCharacter::GetFirstPowerup() const
 {	
 	for (int32 i = 0; i < Inventory.Num(); i++)
 	{
@@ -1908,7 +1908,7 @@ void AShooterCharacter::Exec_AddSpellCharge_Implementation(float Amount)
 
 void AShooterCharacter::AddSpellChargeOnKill(AShooterCharacter* KilledCharacter)
 {
-	if (KilledCharacter != nullptr)
+	if (KilledCharacter != nullptr && KilledCharacter != this)
 	{
 		const float DistanceToHitCharacterSquared = FVector::DistSquared(GetActorLocation(), KilledCharacter->GetActorLocation());
 		const float InterpAlpha = FMath::GetMappedRangeValueClamped(FVector2D(SpellChargeGainDistanceMinSquared, SpellChargeGainDistanceMaxSquared), FVector2D(1.f, 0.f), DistanceToHitCharacterSquared);

@@ -4,14 +4,10 @@
 #pragma once
 
 #include "GameFramework/GameState.h"
-#include "Player/ShooterPlayerState.h"
 #include "UI/ShooterMessageHandler.h"
 #include "ShooterGameState.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogShooterGameState, Log, All);
-
-/** ranked PlayerState map, created from the GameState */
-typedef TMap<int32, TWeakObjectPtr<AShooterPlayerState> > RankedPlayerMap; 
 
 UCLASS(config = Game)
 class AShooterGameState : public AGameState
@@ -74,15 +70,15 @@ protected:
 	class UShooterMessageHandler* MessageHandlerInst;
 
 	/** message handler blueprint class reference */
-	UPROPERTY(EditDefaultsOnly, Category = "Game State")
+	UPROPERTY(EditDefaultsOnly, Category = GameState)
 	TSubclassOf<class UShooterMessageHandler> MessageHandlerClass;
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = GameState)
+	UFUNCTION(BlueprintPure, Category = GameState)
 	int32 GetTeamScore(uint8 TeamNum) const;
 
-	UFUNCTION(BlueprintCallable, Category = GameState)
+	UFUNCTION(BlueprintPure, Category = GameState)
 	uint8 GetNumTeams() const;
 
 	UFUNCTION(BlueprintCallable, Category=GameState)
@@ -99,19 +95,19 @@ public:
 	int32 GetTotalKills();
 
 	/** returns whether this is a team game */
-	UFUNCTION(BlueprintCallable, Category = GameState)
+	UFUNCTION(BlueprintPure, Category = GameState)
 	bool IsTeamGame() const;
 
-	/** returns Player's position in the match */
-	UFUNCTION(BlueprintCallable, Category = GameState)
-	int32 GetPlayerPosition(AShooterPlayerState* Player) const;
+	/** returns Player's position in the match, [1..n] */
+	UFUNCTION(BlueprintPure, Category = GameState)
+	int32 GetPlayerPosition(class AShooterPlayerState* Player) const;
 
-	/** returns Player's team position in the match */
-	UFUNCTION(BlueprintCallable, Category = GameState)
-	int32 GetPlayersTeamPosition(AShooterPlayerState* Player) const;
+	/** returns Player's team position in the match, [1..n] */
+	UFUNCTION(BlueprintPure, Category = GameState)
+	int32 GetPlayersTeamPosition(class AShooterPlayerState* Player) const;
 
 	/** returns the number of players. If Team == -1, returns the total number of players; otherwise, returns given team's number of players. */
-	UFUNCTION(BlueprintCallable, Category = GameState)
+	UFUNCTION(BlueprintPure, Category = GameState)
 	int32 GetNumberOfPlayers(int32 Team = -1) const;
 
 	class UShooterMessageHandler* GetMessageHandler() const;
@@ -122,8 +118,9 @@ public:
 	/////////////////////////
 	// Misc variables
 
-	/** gets ranked PlayerState map for specific team */
-	void GetRankedMap(int32 TeamIndex, RankedPlayerMap& OutRankedMap) const;
+	/** gets ranked PlayerState map for specific team (first rank = position 0) */
+	UFUNCTION(BlueprintPure, Category = GameState)
+	TArray<class AShooterPlayerState*> GetRankedPlayerArray(int32 TeamIndex) const;
 	
 	void RequestFinishAndExitToMainMenu();
 };

@@ -224,13 +224,11 @@ void UShooterPersistentUser::SaveIfDirty()
 	}
 }
 
-void UShooterPersistentUser::AddMatchResult(int32 MatchKills, int32 MatchDeaths, int32 MatchSuicides, int32 MatchBulletsFired, int32 MatchRocketsFired, bool bIsMatchWinner)
+void UShooterPersistentUser::AddMatchResult(int32 MatchKills, int32 MatchDeaths, int32 MatchSuicides, bool bIsMatchWinner)
 {
 	Kills += MatchKills;
 	Deaths += MatchDeaths;
 	Suicides += MatchSuicides;
-	BulletsFired += MatchBulletsFired;
-	RocketsFired += MatchRocketsFired;
 
 	if (bIsMatchWinner)
 	{
@@ -345,16 +343,6 @@ int32 UShooterPersistentUser::GetWins() const
 int32 UShooterPersistentUser::GetLosses() const
 {
 	return Losses;
-}
-
-int32 UShooterPersistentUser::GetBulletsFired() const
-{
-	return BulletsFired;
-}
-
-int32 UShooterPersistentUser::GetRocketsFired() const
-{
-	return RocketsFired;
 }
 
 FString UShooterPersistentUser::GetName() const

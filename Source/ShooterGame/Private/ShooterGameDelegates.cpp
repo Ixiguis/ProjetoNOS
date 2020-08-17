@@ -5,6 +5,7 @@
 #include "GameRules/ShooterGameState.h"
 #include "ShooterEngine.h"
 #include "Player/ShooterLocalPlayer.h"
+#include "Player/ShooterPlayerState.h"
 
 // respond to requests from a companion app
 static void WebServerDelegate(int32 UserIndex, const FString& Action, const FString& URL, const TMap<FString, FString>& Params, TMap<FString, FString>& Response)
@@ -27,18 +28,16 @@ static void WebServerDelegate(int32 UserIndex, const FString& Action, const FStr
 					// get the shoter game
 					AShooterGameState* const GameState = Cast<AShooterGameState>(Player->PlayerController->GetWorld()->GetGameState());
 
-
-					RankedPlayerMap Players;
-					GameState->GetRankedMap(0, Players);
+					TArray<AShooterPlayerState*> PlayerStates = GameState->GetRankedPlayerArray(0);
 
 					bool bNeedsComma = false;
-					for (auto It = Players.CreateIterator(); It; ++It)
+					for (AShooterPlayerState* PlayerState : PlayerStates)
 					{
 						if (bNeedsComma)
 						{
 							ScoreboardStr += TEXT(" ,");
 						}
-						ScoreboardStr += FString::Printf(TEXT(" { \"n\" : \"%s\" , \"k\" : \"%d\" , \"d\" : \"%d\" }"), *It.Value()->GetShortPlayerName(), It.Value()->GetKills(), It.Value()->GetDeaths());
+						ScoreboardStr += FString::Printf(TEXT(" { \"n\" : \"%s\" , \"k\" : \"%d\" , \"d\" : \"%d\" }"), *PlayerState->GetShortPlayerName(), PlayerState->GetKills(), PlayerState->GetDeaths());
 						bNeedsComma = true;
 					}
 				}

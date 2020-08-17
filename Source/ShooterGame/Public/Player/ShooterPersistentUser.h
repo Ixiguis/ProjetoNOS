@@ -24,35 +24,29 @@ public:
 	void SaveIfDirty();
 
 	/** Records the result of a match. */
-	void AddMatchResult(int32 MatchKills, int32 MatchDeaths, int32 MatchSuicides, int32 MatchBulletsFired, int32 MatchRocketsFired, bool bIsMatchWinner);
+	void AddMatchResult(int32 MatchKills, int32 MatchDeaths, int32 MatchSuicides, bool bIsMatchWinner);
 
 	/** needed because we can recreate the subsystem that stores it */
 	void TellInputAboutKeybindings();
 
 	int32 GetUserIndex() const;
 
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	int32 GetKills() const;
 
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	int32 GetDeaths() const;
 	
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	int32 GetSuicides() const;
 
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	int32 GetWins() const;
 
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	int32 GetLosses() const;
 
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
-	int32 GetBulletsFired() const;
-
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
-	int32 GetRocketsFired() const;
-
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	FString GetName() const;
 	
 	inline bool PlayerNameIsDefault() const
@@ -60,10 +54,10 @@ public:
 		return PlayerName == "Player";
 	}
 	
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	FString GetPlayerName() const;
 
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	FLinearColor GetColor(uint8 ColorIndex) const;
 	
 	inline int32 GetNumColors() const { return PlayerColors.Num(); }
@@ -83,11 +77,11 @@ public:
 	TArray<FInvasionWave> InvasionWaves;
 
 	/** Returns the ShooterLocalPlayer that owns this save game. */
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	class UShooterLocalPlayer* GetLocalPlayer() const;
 	
 	/** Returns the AShooterPlayerController that owns this save game. */
-	UFUNCTION(BlueprintCallable, Category=SaveGame)
+	UFUNCTION(BlueprintPure, Category=SaveGame)
 	class AShooterPlayerController* GetPlayerController() const;
 	
 	FORCEINLINE bool IsRecordingDemos() const
@@ -128,15 +122,6 @@ protected:
 	/** Lifetime count of match losses */
 	UPROPERTY()
 	int32 Losses;
-
-	/** Lifetime count of bullets fired */
-	UPROPERTY()
-	int32 BulletsFired;
-
-	/** Lifetime count of rockets fired */
-	UPROPERTY()
-	int32 RocketsFired;
-
 
 	/** is recording demos? */
 	UPROPERTY()

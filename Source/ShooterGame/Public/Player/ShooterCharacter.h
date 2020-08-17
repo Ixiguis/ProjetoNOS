@@ -139,8 +139,8 @@ public:
 	bool SwitchWeaponIfNoAmmo();
 
 	/** Returns the first powerup found in this character's inventory, NULL if none */
-	UFUNCTION(BlueprintCallable, Category=Inventory)
-	class AShooterItem_Powerup* GetFirstPowerup();
+	UFUNCTION(BlueprintPure, Category=Inventory)
+	class AShooterItem_Powerup* GetFirstPowerup() const;
 	
 	/** Whether a powerup is currently in effect. Currently, used for HUD only. */
 	UPROPERTY(BlueprintReadOnly, Category=Inventory)

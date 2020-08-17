@@ -14,7 +14,7 @@ AShooterItem_Powerup::AShooterItem_Powerup()
 	Duration = 30.f;
 }
 
-float AShooterItem_Powerup::GetRemainingDuration()
+float AShooterItem_Powerup::GetRemainingDuration() const
 {
 	if (!bIsActive)
 	{
