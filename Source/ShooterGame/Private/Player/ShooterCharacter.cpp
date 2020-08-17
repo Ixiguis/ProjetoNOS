@@ -101,6 +101,7 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	HeadBoneNames.Add(FName("b_head"));
 	HeadBoneNames.Add(FName("b_neck"));
 	bShouldRespawn = true;
+	bEnablePrevNextWeaponEvent = true;
 
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -1481,40 +1482,51 @@ void AShooterCharacter::OnReload()
 
 void AShooterCharacter::OnNextWeapon()
 {
-	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (bEnablePrevNextWeaponEvent)
 	{
-		if (Inventory.Num() >= 2)
+		AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
+		if (MyPC && MyPC->IsGameInputAllowed())
 		{
-			int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
-			AShooterWeapon* NextWeapon = NULL;
-			while (NextWeapon == NULL)
+			if (Inventory.Num() >= 2)
 			{
-				++CurrentWeaponIdx;
-				NextWeapon = Cast<AShooterWeapon>(Inventory[(CurrentWeaponIdx) % Inventory.Num()]);
+				int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
+				AShooterWeapon* NextWeapon = NULL;
+				while (NextWeapon == NULL)
+				{
+					++CurrentWeaponIdx;
+					NextWeapon = Cast<AShooterWeapon>(Inventory[(CurrentWeaponIdx) % Inventory.Num()]);
+				}
+				EquipWeapon(NextWeapon);
 			}
-			EquipWeapon(NextWeapon);
 		}
 	}
 }
 
 void AShooterCharacter::OnPrevWeapon()
 {
-	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (bEnablePrevNextWeaponEvent)
 	{
-		if (Inventory.Num() >= 2)
+		AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
+		if (MyPC && MyPC->IsGameInputAllowed())
 		{
-			int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon) + Inventory.Num();
-			AShooterWeapon* NextWeapon = NULL;
-			while (NextWeapon == NULL)
+			if (Inventory.Num() >= 2)
 			{
-				--CurrentWeaponIdx;
-				NextWeapon = Cast<AShooterWeapon>(Inventory[(CurrentWeaponIdx) % Inventory.Num()]);
+				int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon) + Inventory.Num();
+				AShooterWeapon* NextWeapon = NULL;
+				while (NextWeapon == NULL)
+				{
+					--CurrentWeaponIdx;
+					NextWeapon = Cast<AShooterWeapon>(Inventory[(CurrentWeaponIdx) % Inventory.Num()]);
+				}
+				EquipWeapon(NextWeapon);
 			}
-			EquipWeapon(NextWeapon);
 		}
 	}
+}
+
+void AShooterCharacter::SetPrevNextWeaponEventEnabled(bool bEnable)
+{
+	bEnablePrevNextWeaponEvent = bEnable;
 }
 
 AShooterWeapon* AShooterCharacter::SwitchToWeaponCategory(uint8 Category)

@@ -267,6 +267,12 @@ public:
 	/** player pressed prev weapon action */
 	void OnPrevWeapon();
 
+	/** enables or disables Next/PrevWeapon events. Used by the player controller, to allow scrolling on widgets while in-game. */
+	UFUNCTION(BlueprintCallable, Category=Input)
+	void SetPrevNextWeaponEventEnabled(bool bEnable);
+
+	bool bEnablePrevNextWeaponEvent;
+
 	/** player pressed jump action */
 	void OnStartJump();
 
