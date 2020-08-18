@@ -647,8 +647,8 @@ void AShooterWeapon::FireWeapon()
 	}
 	PreviousSeed = RandomSeed;
 
-	const bool bShouldProcessInstantHit =	(GetLocalRole() == ROLE_Authority && !GetGameState()->bClientSideHitVerification) ||
-											(IsLocallyControlled() && GetGameState()->bClientSideHitVerification) ||
+	const bool bShouldProcessInstantHit =	(GetLocalRole() == ROLE_Authority && GetGameState() && !GetGameState()->bClientSideHitVerification) ||
+											(IsLocallyControlled() && GetGameState() && GetGameState()->bClientSideHitVerification) ||
 											(IsLocallyControlled() && GetLocalRole() == ROLE_Authority);
 
 	if ( FiringMode[CurrentFireMode] == FM_Charge && !IsCharging() )

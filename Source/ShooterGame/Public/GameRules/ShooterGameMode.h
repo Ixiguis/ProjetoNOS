@@ -225,10 +225,6 @@ protected:
 	
 	FTimerHandle SyncPhysBodiesHandle;
 
-	/** interval (seconds) between physics bodies synchronization. Set to zero to disable this. */
-	UPROPERTY(config)
-	float PhysicsBodiesSyncTime;
-	
 	/** Whether to sync ragdolls (corpses) locations between server and clients */
 	UPROPERTY(config)
 	bool bSyncRagdolls;
@@ -260,15 +256,6 @@ public:
 	/** Calls PC->ClientSendMessage for all player controllers. */
 	void MessagePlayers(TEnumAsByte<EMessageTypes::Type> MessageType, AController* MessageRelativeTo, const FString& InstigatorName = FString(), const FString& InstigatedName = FString(), uint8 OptionalRank = 0, uint8 OptionalTeam = 0) const;
 	void MessagePlayers(TEnumAsByte<EMessageTypes::Type> MessageType, AController* MessageRelativeTo, const APawn* Instigator = NULL, const APawn* Instigated = NULL, uint8 OptionalRank = 0, uint8 OptionalTeam = 0) const;
-
-	private:
-
-	/** sends the location, velocity, and rotation of all physics bodies from server to clients, to ensure they are in the same place */
-	void SyncPhysicsBodies();
-
-	/** every 10 iterations, a full sync will be performed (regardless whether the rigid bodies are asleep or not) */
-	int32 PhysicsBodiesSyncCounter;
-
 };
 
 FORCEINLINE int32 AShooterGameMode::GetWarmupTime()

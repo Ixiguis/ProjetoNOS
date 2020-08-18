@@ -1209,30 +1209,3 @@ float AShooterPlayerController::GetMouseSensitivityY() const
 {
 	return PlayerInput->GetMouseSensitivityY();
 }
-
-void AShooterPlayerController::ClientUpdatePhysicsBody_Implementation(UPrimitiveComponent* PhysBody, const FVector_NetQuantize& Loc, const FVector_NetQuantize& LinearVel, const FVector_NetQuantize& AngularVel, const FQuat& Rot)
-{
-	if (PhysBody)
-	{
-		#define LocationMaxDifferenceSq 100*100
-		if ((Loc - PhysBody->GetComponentTransform().GetTranslation()).SizeSquared() > LocationMaxDifferenceSq)
-		{
-			PhysBody->SetWorldLocationAndRotation(Loc, Rot);
-			PhysBody->SetAllPhysicsLinearVelocity(LinearVel);
-			PhysBody->SetAllPhysicsAngularVelocityInDegrees(AngularVel);
-		}
-	}
-}
-
-void AShooterPlayerController::ClientUpdatePhysicsBody_(UPrimitiveComponent* PhysBody)
-{
-	if (PhysBody)
-	{
-		const FVector_NetQuantize Loc = PhysBody->GetComponentToWorld().GetTranslation();
-		const FQuat Rot = PhysBody->GetComponentToWorld().GetRotation();
-		const FVector_NetQuantize LinearVel = PhysBody->GetPhysicsLinearVelocity();
-		const FVector_NetQuantize AngularVel = PhysBody->GetPhysicsAngularVelocityInDegrees();
-		ClientUpdatePhysicsBody(PhysBody, Loc, LinearVel, AngularVel, Rot);
-	}
-}
-

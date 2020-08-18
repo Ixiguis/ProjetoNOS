@@ -699,6 +699,9 @@ void AShooterCharacter::SetRagdollPhysics()
 		GetMesh()->WakeAllRigidBodies();
 		GetMesh()->bBlendPhysics = true;
 
+		//enable replication on the mesh (to sync physics between clients)
+		GetMesh()->SetIsReplicated(true);
+
 		//GetMesh()->SetNotifyRigidBodyCollision(true);
 		
 		//regenerate impulse from LastTakeHitInfo (it's not replicated in time on GetCharacterMovement())

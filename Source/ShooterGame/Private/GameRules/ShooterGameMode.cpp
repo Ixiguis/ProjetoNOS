@@ -50,8 +50,6 @@ AShooterGameMode::AShooterGameMode(const FObjectInitializer& ObjectInitializer) 
 	GameModeInfo.bRequiresMapPrefix=false;
 	
 	bUnlimitedRoundTime = RoundTime == 0;
-
-	PhysicsBodiesSyncCounter = 0;
 }
 
 void AShooterGameMode::PostInitProperties()
@@ -145,11 +143,6 @@ void AShooterGameMode::HandleMatchHasStarted()
 			PC->ClientGameStarted();
 		}
 	}
-
-	if (PhysicsBodiesSyncTime > 0.f)
-	{
-		GetWorldTimerManager().SetTimer(SyncPhysBodiesHandle, this, &AShooterGameMode::SyncPhysicsBodies, PhysicsBodiesSyncTime, true);
-	}
 }
 
 void AShooterGameMode::FinishMatch()
@@ -189,11 +182,6 @@ void AShooterGameMode::FinishMatch()
 
 		// set up to restart the match
 		ShooterGameState->RemainingTime = TimeBetweenMatches;
-	}
-	
-	if (PhysicsBodiesSyncTime > 0.f)
-	{
-		GetWorldTimerManager().ClearTimer(SyncPhysBodiesHandle);
 	}
 }
 
@@ -759,43 +747,4 @@ FString AShooterGameMode::GetGameModeShortName() const
 		}
 	}
 	return TEXT("");
-}
-
-void AShooterGameMode::SyncPhysicsBodies()
-{
-	if(GetWorld() != nullptr)
-	{
-		PhysicsBodiesSyncCounter++;
-		for(TActorIterator<AActor> It(GetWorld(), AActor::StaticClass()); It; ++It)
-		{
-			AActor* Actor = *It;
-			if(!Actor->IsPendingKill())
-			{
-				TArray<UActorComponent*> Comps;
-				Actor->GetComponents(UPrimitiveComponent::StaticClass(), Comps);
-				for (UActorComponent* Comp : Comps)
-				{
-					UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(Comp);
-					if (PrimComp->IsSimulatingPhysics() && (bSyncRagdolls || !PrimComp->IsA(USkeletalMeshComponent::StaticClass())) )
-					{
-						if (PrimComp->RigidBodyIsAwake() || PhysicsBodiesSyncCounter >= 10)
-						{
-							for (FConstControllerIterator ControllerIt = GetWorld()->GetControllerIterator(); It; ++It)
-							{
-								AShooterPlayerController* PC = Cast<AShooterPlayerController>(ControllerIt->Get());
-								if (PC)
-								{
-									PC->ClientUpdatePhysicsBody_(PrimComp);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (PhysicsBodiesSyncCounter >= 10)
-		{
-			PhysicsBodiesSyncCounter = 0;
-		}
-	}
 }

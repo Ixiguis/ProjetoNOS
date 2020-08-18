@@ -273,14 +273,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Controller")
 	void CrosshairChanged(UTexture2D* NewCrosshair);
 
-	/** Sends a physic body's data to the client, to keep it in sync with the server. */
-	UFUNCTION(Client, Unreliable)
-	void ClientUpdatePhysicsBody(UPrimitiveComponent* PhysBody, const FVector_NetQuantize& Loc, const FVector_NetQuantize& LinearVel, const FVector_NetQuantize& AngularVel, const FQuat& Rot);
-
-	/** Wrapper to call the above function ("Sends a physic body's data to the client, to keep it in sync with the server.") */
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="Physics")
-	void ClientUpdatePhysicsBody_(UPrimitiveComponent* PhysBody);
-
 protected:
 
 	/** infinite ammo cheat */
