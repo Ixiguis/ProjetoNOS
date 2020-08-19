@@ -1371,12 +1371,6 @@ void AShooterCharacter::SetupPlayerInputComponent(class UInputComponent* TheInpu
 	
 	TheInputComponent->BindAction("NextWeapon", IE_Pressed, this, &AShooterCharacter::OnNextWeapon);
 	TheInputComponent->BindAction("PrevWeapon", IE_Pressed, this, &AShooterCharacter::OnPrevWeapon);
-	TheInputComponent->BindAction("WeaponCat1", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory1);
-	TheInputComponent->BindAction("WeaponCat2", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory2);
-	TheInputComponent->BindAction("WeaponCat3", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory3);
-	TheInputComponent->BindAction("WeaponCat4", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory4);
-	TheInputComponent->BindAction("WeaponCat5", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory5);
-	TheInputComponent->BindAction("WeaponCat6", IE_Pressed, this, &AShooterCharacter::SwitchToWeaponCategory6);
 
 	TheInputComponent->BindAction("Jump", IE_Pressed, this, &AShooterCharacter::OnStartJump);
 	TheInputComponent->BindAction("Jump", IE_Released, this, &AShooterCharacter::OnStopJump);
@@ -1530,67 +1524,6 @@ void AShooterCharacter::OnPrevWeapon()
 void AShooterCharacter::SetPrevNextWeaponEventEnabled(bool bEnable)
 {
 	bEnablePrevNextWeaponEvent = bEnable;
-}
-
-AShooterWeapon* AShooterCharacter::SwitchToWeaponCategory(uint8 Category)
-{
-	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
-	{
-		if (Inventory.Num() >= 2)
-		{
-			int32 CurrentWeaponIdx = CurrentWeapon->WeaponCategory == Category ? Inventory.IndexOfByKey(CurrentWeapon) : 0;
-			int32 InvSize = Inventory.Num();
-			int32 Attempts=0;
-			AShooterWeapon* NextWeapon = NULL;
-			while (NextWeapon == NULL && Attempts <= InvSize)
-			{
-				++Attempts;
-				++CurrentWeaponIdx;
-				NextWeapon = Cast<AShooterWeapon>(Inventory[(CurrentWeaponIdx) % Inventory.Num()]);
-				if (NextWeapon && NextWeapon->WeaponCategory != Category)
-				{
-					NextWeapon = NULL;
-				}
-			}
-			if (NextWeapon && NextWeapon != CurrentWeapon)
-			{
-				EquipWeapon(NextWeapon);
-				return NextWeapon;
-			}
-		}
-	}
-	return NULL;
-}
-
-void AShooterCharacter::SwitchToWeaponCategory1()
-{
-	SwitchToWeaponCategory(1);
-}
-
-void AShooterCharacter::SwitchToWeaponCategory2()
-{
-	SwitchToWeaponCategory(2);
-}
-
-void AShooterCharacter::SwitchToWeaponCategory3()
-{
-	SwitchToWeaponCategory(3);
-}
-
-void AShooterCharacter::SwitchToWeaponCategory4()
-{
-	SwitchToWeaponCategory(4);
-}
-
-void AShooterCharacter::SwitchToWeaponCategory5()
-{
-	SwitchToWeaponCategory(5);
-}
-
-void AShooterCharacter::SwitchToWeaponCategory6()
-{
-	SwitchToWeaponCategory(6);
 }
 
 void AShooterCharacter::OnStartRunning()

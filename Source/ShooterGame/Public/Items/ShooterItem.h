@@ -35,6 +35,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Item)
 	virtual void EquipItem();
 
+	inline FText GetItemName() { return ItemName; }
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category=Item, Transient, ReplicatedUsing=OnRep_MyPawn)

@@ -304,20 +304,6 @@ public:
 	
 	void OnUse();
 	
-	AShooterWeapon* SwitchToWeaponCategory(uint8 Category);
-	
-	void SwitchToWeaponCategory1();
-	
-	void SwitchToWeaponCategory2();
-
-	void SwitchToWeaponCategory3();
-
-	void SwitchToWeaponCategory4();
-
-	void SwitchToWeaponCategory5();
-
-	void SwitchToWeaponCategory6();
-	
 	/** returns the best weapon (as defined by WeaponPriority) that has ammo and
 	  * has AIWeaponRange >= AIMinWeaponRangeSquared */
 	UFUNCTION()

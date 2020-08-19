@@ -18,11 +18,6 @@
 
 DEFINE_LOG_CATEGORY(LogShooterWeapon);
 
-// To maintain consistency between clients and server on RandomStream::VRandCone() calls,
-// we'll use a constant vector on that function, instead of passing the AimDir directly,
-// because AimDir will be slightly different across clients and VRandCone() will generate very different results.
-const FVector ForwardVector = FVector(1.0f, 0.f, 0.f);
-
 AShooterWeapon::AShooterWeapon()
 {
 	NetUpdateFrequency = 20.f;
@@ -34,10 +29,11 @@ AShooterWeapon::AShooterWeapon()
 	Mesh1P->bOnlyOwnerSee = true;
 	Mesh1P->bOwnerNoSee = false;
 	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);
-	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Mesh1P->bLocalSpaceSimulation = true;
-	RootComponent = Mesh1P;
+	Mesh1P->SetIsReplicated(true);
+	SetRootComponent(Mesh1P);
 
 	Mesh3P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh3P"));
 	Mesh3P->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
@@ -46,11 +42,12 @@ AShooterWeapon::AShooterWeapon()
 	Mesh3P->bOwnerNoSee = true;
 	Mesh3P->bOnlyOwnerSee = false;
 	Mesh3P->SetCollisionObjectType(ECC_WorldDynamic);
-	Mesh3P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh3P->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Mesh3P->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Mesh3P->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
 	Mesh3P->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	Mesh3P->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	Mesh3P->SetIsReplicated(true);
 	Mesh3P->SetupAttachment(Mesh1P);
 
 	bPlayingFireAnim = false;
@@ -121,14 +118,14 @@ void AShooterWeapon::Tick(float DeltaSeconds)
 		CurrentFiringDispersion = FMath::Max(CurrentFiringDispersion - WeaponConfig.FiringDispersionDecrement * DeltaSeconds, WeaponConfig.BaseFiringDispersion);
 	}
 
-#if !UE_BUILD_SHIPPING
+#if WITH_EDITOR
+	//update socket transform every frame in editor, for easy positioning (live update in-game)
 	if (bIsEquipped || CurrentState == EWeaponState::Equipping)
 	{
-		AttachMeshToPawn();
-		FTransform RightHand = Mesh3P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
-		Mesh3P->SetRelativeTransform(RightHand);
-		RightHand = Mesh1P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
-		Mesh1P->SetRelativeTransform(RightHand);
+		FTransform RightHand = Mesh1P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
+		Mesh1P->SetRelativeTransform(RightHand,false, nullptr, ETeleportType::TeleportPhysics);
+		RightHand = Mesh3P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
+		Mesh3P->SetRelativeTransform(RightHand, false, nullptr, ETeleportType::TeleportPhysics);
 	}
 #endif
 }
@@ -259,40 +256,46 @@ void AShooterWeapon::AttachMeshToPawn()
 {
 	if (MyPawn)
 	{
-		DetachMeshFromPawn();
-
 		const FName AttachPoint = MyPawn->GetWeaponAttachPoint();
 		
 		if (MyPawn->GetPawnMesh1P()->SkeletalMesh != nullptr)
 		{
-			Mesh1P->AttachToComponent(MyPawn->GetPawnMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachPoint);
+			if (GetLocalRole() == ROLE_Authority)
+			{
+				Mesh1P->AttachToComponent(MyPawn->GetPawnMesh1P(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true), AttachPoint);
+				FTransform RightHand = Mesh1P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
+				Mesh1P->SetRelativeTransform(RightHand);
+			}
 			Mesh1P->SetHiddenInGame(false, true);
+
+			//reset cloth simulation (prevent stretches)
+			Mesh1P->ForceClothNextUpdateTeleportAndReset();
 			// @@ se o cloth da soul hunter falhar:
 			//Mesh1P->TickClothing(0.16f);
-			Mesh1P->ForceClothNextUpdateTeleportAndReset();
 		}
 
 		if (MyPawn->GetPawnMesh3P()->SkeletalMesh != nullptr)
 		{
-			Mesh3P->AttachToComponent(MyPawn->GetPawnMesh3P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachPoint);
+			if (GetLocalRole() == ROLE_Authority)
+			{
+				Mesh3P->AttachToComponent(MyPawn->GetPawnMesh3P(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true), AttachPoint);
+				FTransform RightHand = Mesh3P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
+				Mesh3P->SetRelativeTransform(RightHand);
+			}
 			Mesh3P->SetHiddenInGame(false, true);
-
-			FTransform RightHand = Mesh3P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
-			Mesh3P->RootBoneTranslation = RightHand.GetLocation();
-			//Mesh3P->SetRelativeTransform(RightHand);
-			RightHand = Mesh1P->GetSocketTransform(RightHandAttachPoint, RTS_Component);
-			Mesh1P->RootBoneTranslation = RightHand.GetLocation();
-			//Mesh1P->SetRelativeTransform(RightHand);
+			Mesh3P->ForceClothNextUpdateTeleportAndReset();
 		}
 	}
 }
 
 void AShooterWeapon::DetachMeshFromPawn()
 {
-	Mesh1P->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		Mesh1P->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		Mesh3P->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	}
 	Mesh1P->SetHiddenInGame(true, true);
-
-	Mesh1P->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	Mesh3P->SetHiddenInGame(true, true);
 }
 
@@ -1139,7 +1142,9 @@ void AShooterWeapon::ProcessInstantHit(uint8 RandomSeed)
 		const uint8 NumPellets = InstantConfig[CurrentFireMode].BulletsToSpawn;
 		for (uint8 Pellet=0; Pellet < NumPellets; Pellet++)
 		{
-			const FVector ShootDirFwd = WeaponRandomStream.VRandCone(ForwardVector, ConeHalfAngle, ConeHalfAngle);
+			// using FVector::ForwardVector in VRandCone and then rotating it in order to get consistent results between clients 
+			// (because AimDir is quantized, VRandCone would give different results)
+			const FVector ShootDirFwd = WeaponRandomStream.VRandCone(FVector::ForwardVector, ConeHalfAngle, ConeHalfAngle);
 			FVector ShootDir = AimDir.Rotation().RotateVector(ShootDirFwd);
 			EndTrace = StartTrace + ShootDir * InstantConfig[CurrentFireMode].WeaponRange;
 			uint8  Bounce = 0;
@@ -1268,7 +1273,7 @@ void AShooterWeapon::ServerNotifyInstantHit_Implementation(FHitResult Impact, ui
 	for (uint8 i = 0; i <= ShotIndex; i++)
 	{
 		//call this a number of times equal to ShotIndex, to get the same result as the client had
-		ShootDirFwd = WeaponRandomStream.VRandCone(ForwardVector, ConeHalfAngle, ConeHalfAngle);
+		ShootDirFwd = WeaponRandomStream.VRandCone(FVector::ForwardVector, ConeHalfAngle, ConeHalfAngle);
 	}
 	FVector ShootDir = AimDir.Rotation().RotateVector(ShootDirFwd);
 
@@ -1443,7 +1448,7 @@ void AShooterWeapon::SimulateInstantHit(uint8 RandomSeed)
 		IncrementMuzzleIndex();
 		for (uint8 Pellet=0; Pellet < InstantConfig[CurrentFireMode].BulletsToSpawn; Pellet++)
 		{
-			const FVector ShootDirFwd = WeaponRandomStream.VRandCone(ForwardVector, ConeHalfAngle, ConeHalfAngle);
+			const FVector ShootDirFwd = WeaponRandomStream.VRandCone(FVector::ForwardVector, ConeHalfAngle, ConeHalfAngle);
 			FVector ShootDir = AimDir.Rotation().RotateVector(ShootDirFwd);
 			EndTrace = StartTrace + ShootDir * InstantConfig[CurrentFireMode].WeaponRange;
 			uint8  Bounce = 0;
@@ -1566,7 +1571,7 @@ void AShooterWeapon::FireProjectile(uint8 RandomSeed)
 	{
 		UseAmmo();
 		GetAdjustedAim(AimDir, Origin);
-		const FVector ShootDirFwd = WeaponRandomStream.VRandCone(ForwardVector, ConeHalfAngle, ConeHalfAngle);
+		const FVector ShootDirFwd = WeaponRandomStream.VRandCone(FVector::ForwardVector, ConeHalfAngle, ConeHalfAngle);
 		FVector ShootDir = AimDir.Rotation().RotateVector(ShootDirFwd);
 		IncrementMuzzleIndex();
 
