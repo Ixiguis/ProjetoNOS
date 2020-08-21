@@ -13,6 +13,7 @@
 #include "Engine/DirectionalLight.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/LightComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 UShooterBlueprintLibrary::UShooterBlueprintLibrary()
 {
@@ -302,24 +303,6 @@ bool UShooterBlueprintLibrary::FindTeleportSpot(AActor* TestActor, FVector Place
 		return TestActor->GetWorld()->FindTeleportSpot(TestActor, ResultingLocation, PlaceRotation);
 	}
 	return false;
-}
-
-FText UShooterBlueprintLibrary::GetTeamColorText(int32 TeamNum)
-{
-	if (TeamNum < GMaxTeams)
-	{
-		return GTeamColorsText[TeamNum];
-	}
-	return FText();
-}
-
-FLinearColor UShooterBlueprintLibrary::GetTeamColor(int32 TeamNum)
-{
-	if (TeamNum < GMaxTeams)
-	{
-		return GTeamColors[TeamNum];
-	}
-	return FLinearColor::Gray;
 }
 
 FText UShooterBlueprintLibrary::FormatTime(float TimeSeconds)

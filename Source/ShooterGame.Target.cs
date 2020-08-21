@@ -10,6 +10,8 @@ public class ShooterGameTarget : TargetRules
     {
         Type = TargetType.Game;
         bUsesSteam = true;
+        DefaultBuildSettings = BuildSettingsVersion.V2;
+        bIWYU = true;
 
 		ExtraModuleNames.Add("ShooterGame");
     }

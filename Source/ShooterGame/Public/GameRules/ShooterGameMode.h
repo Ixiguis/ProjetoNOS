@@ -201,13 +201,13 @@ protected:
 	virtual bool IsWinner(class AShooterPlayerState* PlayerState) const;
 
 	/** check if player can use spawnpoint */
-	virtual bool IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const;
+	virtual bool IsSpawnpointAllowed(class APlayerStart* SpawnPoint, AController* Player) const;
 
 	/** check if any other player overlaps this spawn point */
-	virtual bool AnyPawnOverlapsSpawnPoint(APlayerStart* SpawnPoint, AController* Player) const;
+	virtual bool AnyPawnOverlapsSpawnPoint(class APlayerStart* SpawnPoint, AController* Player) const;
 	
 	/** returns the best spawn point from the list, depending on game rules */
-	virtual APlayerStart* GetBestSpawnPoint(const TArray<APlayerStart*>& AvailableSpawns, AController* Player) const;
+	virtual class APlayerStart* GetBestSpawnPoint(const TArray<class APlayerStart*>& AvailableSpawns, AController* Player) const;
 
 	/** Returns game session class to use */
 	virtual TSubclassOf<AGameSession> GetGameSessionClass() const override;

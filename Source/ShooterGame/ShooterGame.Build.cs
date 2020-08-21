@@ -7,14 +7,13 @@ public class ShooterGame : ModuleRules
 {
 	public ShooterGame(ReadOnlyTargetRules Target) : base(Target)
 	{
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        bEnforceIWYU = true;
-        bUseUnity = true;
+        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        //bEnforceIWYU = true;
+        //bUseUnity = true;
 
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"ShooterGame/Private",
-				//"ShooterGame/Private/UI",
             }
 		);
 
