@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.25",
+	"EngineAssociation": "{67399044-4733-88FE-252D-1D83BDCF75CC}",
 	"Category": "FPS",
 	"Description": "",
 	"Modules": [
@@ -61,6 +61,18 @@
 		{
 			"Name": "MLSDK",
 			"Enabled": false
+		},
+		{
+			"Name": "OnlineSubsystemSteam",
+			"Enabled": true
+		},
+		{
+			"Name": "AdvancedSessions",
+			"Enabled": true
+		},
+		{
+			"Name": "AdvancedSteamSessions",
+			"Enabled": true
 		}
 	],
 	"EpicSampleNameHash": "3868556100"

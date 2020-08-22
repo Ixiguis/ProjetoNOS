@@ -63,25 +63,9 @@ namespace EShooterPhysMaterialType
 #define ECC_Projectile	ECC_GameTraceChannel2
 #define ECC_Pickup		ECC_GameTraceChannel3
 
-/** team FColors - the order is red, blue, green, yellow, purple, cyan */
-const FColor GTeamColors[] = { FColor(255, 30, 30), FColor(30, 30, 255), FColor(30, 255, 30), FColor(255, 255, 30), FColor(255, 30, 255), FColor(30, 255, 255) };
-
 /** Number of customizable player colors */
 const int32 GNumPlayerColors = 7;
 
-/** Max amount of teams */
-const int32 GMaxTeams = UE_ARRAY_COUNT(GTeamColors);
-
-/** FText for each team color */
-const FText GTeamColorsText[] = 
-{
-	NSLOCTEXT("Colors", "Red", "Red"),
-	NSLOCTEXT("Colors", "Blue", "Blue"),
-	NSLOCTEXT("Colors", "Green", "Green"),
-	NSLOCTEXT("Colors", "Yellow", "Yellow"),
-	NSLOCTEXT("Colors", "Purple", "Purple"),
-	NSLOCTEXT("Colors", "Cyan", "Cyan"),
-};
 
 USTRUCT()
 struct FDecalData
@@ -131,11 +115,11 @@ struct FMapInfo
 	
 	/** Minimum number of teams supported in this map, if it's for a team-based game mode. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=MapInfo)
-	int32 MinTeams;
+	uint8 MinTeams;
 
 	/** Maximum number of teams supported in this map, if it's for a team-based game mode. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=MapInfo)
-	int32 MaxTeams;
+	uint8 MaxTeams;
 
 	/** Whether this map supports arena game modes (Deathmatch, Invasion, CTF, etc.). If true then it will appear on the menu's map list. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=MapInfo)
@@ -196,11 +180,11 @@ struct FGameModeInfo
 	
 	/** The minimum number of teams this game type supports. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=GameModeInfo)
-	int32 MinTeams;
+	uint8 MinTeams;
 
 	/** The maximum number of teams this game type supports. Maps can also override this. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=GameModeInfo)
-	int32 MaxTeams;
+	uint8 MaxTeams;
 	
 	/** Whether this game mode can ignore number of teams restrictions specified per map, 
 	*	e.g. if true, and the map says it supports 2-4 teams but the game mode supports 1-10 teams, then the UI will allow you to pick 1-10 teams. */
@@ -267,7 +251,7 @@ struct FTakeHitInfo
 	UPROPERTY()
 	TWeakObjectPtr<class AShooterCharacter> PawnInstigator;
 
-	/** Who actually caused the damage */
+	/** What actually caused the damage (e.g. the weapon (if hitscan) or the projectile) */
 	UPROPERTY()
 	TWeakObjectPtr<class AActor> DamageCauser;
 
@@ -275,7 +259,7 @@ struct FTakeHitInfo
 	UPROPERTY()
 	int32 DamageEventClassID;
 
-	/** Rather this was a kill */
+	/** Whether this was a kill */
 	UPROPERTY()
 	uint32 bKilled:1;
 

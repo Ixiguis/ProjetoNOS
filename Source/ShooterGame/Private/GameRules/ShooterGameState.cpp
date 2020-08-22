@@ -261,6 +261,11 @@ void AShooterGameState::RemovePlayerState(APlayerState* PlayerState)
 	}
 }
 
+void AShooterGameState::ReceivedGameModeClass()
+{
+	Super::ReceivedGameModeClass();
+}
+
 int32 AShooterGameState::GetTeamScore(uint8 TeamNum) const
 {
 	return TeamScores[TeamNum];

@@ -73,10 +73,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = GameState)
 	TSubclassOf<class UShooterMessageHandler> MessageHandlerClass;
 
-	//Begin AGameStateBase interface
+	//Begin AGameState interface
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void RemovePlayerState(APlayerState* PlayerState) override;
-	//End AGameStateBase interface
+	virtual void ReceivedGameModeClass() override;
+	//End AGameState interface
 
 public:
 

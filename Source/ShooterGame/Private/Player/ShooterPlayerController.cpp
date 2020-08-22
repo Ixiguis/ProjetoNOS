@@ -806,6 +806,16 @@ bool AShooterPlayerController::SetPause(bool bPause, FCanUnpause CanUnpauseDeleg
 	return Result;
 }
 
+void AShooterPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UShooterPersistentUser* const PersistentUser = GetPersistentUser();
+	if (PersistentUser)
+	{
+		PersistentUser->SaveIfDirty();
+	}
+	Super::EndPlay(EndPlayReason);
+}
+
 void AShooterPlayerController::SetZoomLevel(float Zoom, float MinFOV)
 {
 	Zoom = FMath::Clamp(Zoom, 0.0f, 1.0f);

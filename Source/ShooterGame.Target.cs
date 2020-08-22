@@ -14,5 +14,8 @@ public class ShooterGameTarget : TargetRules
         bIWYU = true;
 
 		ExtraModuleNames.Add("ShooterGame");
+
+        GlobalDefinitions.Add("UE4_PROJECT_STEAMSHIPPINGID=480");
+        GlobalDefinitions.Add("UE4_PROJECT_STEAMGAMEDIR=\"spacewar\"");
     }
 }

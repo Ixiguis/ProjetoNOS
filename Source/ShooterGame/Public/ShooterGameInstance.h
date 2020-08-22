@@ -22,6 +22,9 @@ public:
 
 	class AShooterGameSession* GetGameSession() const;
 	
+	///////////////////////////////////////////////////////////////////////////////
+	// Online stuff
+
 	/** Returns true if the game is in online mode */
 	inline bool GetIsOnline() const { return bIsOnline; }
 
@@ -42,8 +45,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Session")
 	void StopServerSearch();
 
+	///////////////////////////////////////////////////////////////////////////////
+	// Team stuff
+
+	/** returns the team color, used on character materials and UI */
+	UFUNCTION(BlueprintPure, Category = "Team Game")
+	FLinearColor GetTeamColor (uint8 Team) const;
+
+	/** returns the team name, to be displayed in the UI */
+	UFUNCTION(BlueprintPure, Category = "Team Game")
+	FText GetTeamName(uint8 Team) const;
+
+	/** returns the number of defined Team Colors and Team Names */
+	uint8 GetMaxTeams() const;
+
 protected:
 	
+	///////////////////////////////////////////////////////////////////////////////
+	// Online stuff
+
 	/** Starts a game as a host */
 	UFUNCTION(BlueprintCallable, Category="Session")
 	bool HostGame(ULocalPlayer* LocalPlayer, const FString& GameModePrefix, const FString& MapFileName, const bool bIsLanMatch, const int32 MaxNumPlayers, const int32 NumBots, const int32 NumLocalPlayers, const int32 ScoreLimit, const int32 RoundTime, const uint8 NumTeams);
@@ -132,4 +152,15 @@ protected:
 	void BeginPlayingState();
 
 	void SetPresenceForLocalPlayers(const FVariantData& PresenceData);
+
+	///////////////////////////////////////////////////////////////////////////////
+	// Team stuff
+
+	/** colors for each possible team. These colors should be fully bright and saturated (some darkening/desaturation may be done in the UI art). Must be in the same order as TeamNames. */
+	UPROPERTY(EditDefaultsOnly, Category="Team Game")
+	TArray<FLinearColor> TeamColors;
+
+	/** team names, to be displayed in the UI. Must be in the same order as TeamColors */
+	UPROPERTY(EditDefaultsOnly, Category = "Team Game")
+	TArray<FText> TeamNames;
 };

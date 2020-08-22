@@ -12,6 +12,22 @@ UShooterGameInstance::UShooterGameInstance()
 	bIsOnline = true;
 	FillMapList();
 	OnEndSessionCompleteDelegate = FOnEndSessionCompleteDelegate::CreateUObject(this, &UShooterGameInstance::OnEndSessionComplete);
+
+	TeamColors.Add(FLinearColor::Red);
+	TeamColors.Add(FLinearColor::Blue);
+	TeamColors.Add(FLinearColor::Green);
+	TeamColors.Add(FLinearColor::Yellow);
+	TeamColors.Add(FLinearColor(0.f, 1.f, 1.f)); //cyan
+	TeamColors.Add(FLinearColor(1.f, 0.f, 1.f)); //magenta
+	TeamColors.Add(FLinearColor::White);
+
+	TeamNames.Add(NSLOCTEXT("Colors", "Red", "Red Team"));
+	TeamNames.Add(NSLOCTEXT("Colors", "Blue", "Blue Team"));
+	TeamNames.Add(NSLOCTEXT("Colors", "Green", "Green Team"));
+	TeamNames.Add(NSLOCTEXT("Colors", "Yellow", "Yellow Team"));
+	TeamNames.Add(NSLOCTEXT("Colors", "Cyan", "Cyan Team"));
+	TeamNames.Add(NSLOCTEXT("Colors", "Magenta", "Magenta Team"));
+	TeamNames.Add(NSLOCTEXT("Colors", "White", "White Team"));
 }
 
 
@@ -28,6 +44,10 @@ AShooterGameSession* UShooterGameInstance::GetGameSession() const
 	}
 	return nullptr;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Online stuff
+///////////////////////////////////////////////////////////////////////////////
 
 // starts playing a game as the host
 bool UShooterGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& GameModePrefix, const FString& MapFileName, const bool bIsLanMatch, const int32 MaxNumPlayers, const int32 NumBots, const int32 NumLocalPlayers, const int32 ScoreLimit, const int32 RoundTime, const uint8 NumTeams)
@@ -482,4 +502,33 @@ void UShooterGameInstance::BeginPlayingState()
 
 	// Make sure viewport has focus
 	//FSlateApplication::Get().SetAllUserFocusToGameViewport();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Team stuff
+///////////////////////////////////////////////////////////////////////////////
+
+FLinearColor UShooterGameInstance::GetTeamColor(uint8 Team) const
+{
+	//@todo: something for color vision deficiency
+	if (Team < GetMaxTeams())
+	{
+		return TeamColors[Team];
+	}
+	return FLinearColor::Gray;
+}
+
+FText UShooterGameInstance::GetTeamName(uint8 Team) const
+{
+	if (Team < GetMaxTeams())
+	{
+		return TeamNames[Team];
+	}
+	return NSLOCTEXT("General", "Undefined", "Undefined");
+}
+
+uint8 UShooterGameInstance::GetMaxTeams() const
+{
+	return FMath::Min(TeamColors.Num(), TeamNames.Num());
 }

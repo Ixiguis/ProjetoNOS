@@ -7,6 +7,7 @@
 #include "Player/ShooterLocalPlayer.h"
 #include "Player/ShooterPersistentUser.h"
 #include "Player/ShooterSpectatorPawn.h"
+#include "ShooterGameInstance.h"
 #include "GameRules/ShooterGameState.h"
 #include "GameRules/ShooterGameMode.h"
 #include "Net/UnrealNetwork.h"
@@ -54,10 +55,10 @@ void AShooterPlayerState::ClientInitialize(class AController* InController)
 {
 	Super::ClientInitialize(InController);
 	
-	// (Client) notify server of my colors for broadcasting, if not a team game
 	AShooterPlayerController* PC = Cast<AShooterPlayerController>(InController);
-	if (PC)
+	if (PC && PC->IsLocalController())
 	{
+		// notify server of my colors for broadcasting, if not a team game
 		UShooterLocalPlayer* ShooterLP = Cast<UShooterLocalPlayer>(PC->GetNetOwningPlayer());
 		UShooterPersistentUser* PersistentUser = ShooterLP ? ShooterLP->GetPersistentUser() : NULL;
 		if (PersistentUser)
@@ -72,46 +73,48 @@ void AShooterPlayerState::ClientInitialize(class AController* InController)
 	}
 }
 
-bool AShooterPlayerState::ServerSetTeamNum_Validate(int32 NewTeamNumber)
+bool AShooterPlayerState::ServerSetTeamNum_Validate(uint8 NewTeamNumber)
 {
-	AShooterGameState* const MyGameState = GetWorld()->GetGameState<AShooterGameState>();
-	int32 MaxTeams = GMaxTeams;
-	if (MyGameState)
-	{
-		MaxTeams = MyGameState->GetNumTeams();
-	}
-	//return NewTeamNumber != TeamNumber && NewTeamNumber >= 0 && NewTeamNumber < MaxTeams;
 	return true;
 }
 // server
-void AShooterPlayerState::ServerSetTeamNum_Implementation(int32 NewTeamNumber)
+void AShooterPlayerState::ServerSetTeamNum_Implementation(uint8 NewTeamNumber)
 {
-	TeamNumber = NewTeamNumber;
-	AShooterGameState* const MyGameState = GetWorld()->GetGameState<AShooterGameState>();
-	if (MyGameState)
+	AShooterGameMode* Game = GetWorld()->GetAuthGameMode<AShooterGameMode>();
+	if (Game && NewTeamNumber < Game->GameModeInfo.MaxTeams)
 	{
-		//server -- set player colors (but keep the Roughness they choose)
-		if (MyGameState->bChangeToTeamColors)
+		TeamNumber = NewTeamNumber;
+		AShooterGameState* const MyGameState = GetWorld()->GetGameState<AShooterGameState>();
+		if (MyGameState)
 		{
-			for (int32 i = 0; i<GetNumColors(); i++)
+			//server -- set player colors (but keep the Roughness they choose)
+			if (MyGameState->bChangeToTeamColors)
 			{
-				const float MyRoughness = PlayerColors[i].A;
-				const FLinearColor TeamColor = FLinearColor(GTeamColors[TeamNumber].R, GTeamColors[TeamNumber].G, GTeamColors[TeamNumber].B, MyRoughness);
-				ServerSetColor_Implementation(i, TeamColor);
+				for (int32 i = 0; i < GetNumColors(); i++)
+				{
+					const float MyRoughness = PlayerColors[i].A;
+					UShooterGameInstance* GI = GetWorld()->GetGameInstance<UShooterGameInstance>();
+					if (GI)
+					{
+						FLinearColor TeamColor = GI->GetTeamColor(TeamNumber);
+						TeamColor.A = MyRoughness;
+						ServerSetColor_Implementation(i, TeamColor);
+					}
+				}
 			}
 		}
-	}
-	AShooterGameMode_TeamDeathMatch* GMTDM = Cast<AShooterGameMode_TeamDeathMatch>(GetWorld()->GetAuthGameMode());
-	AShooterAIController* BotController = Cast<AShooterAIController>(GetOwner());
-	if (GMTDM && !BotController)
-	{
-		GMTDM->PlayerChangedToTeam(this, NewTeamNumber);
-	}
-	AController* OwnerController = Cast<AController>(GetOwner());
-	AShooterCharacter* ShooterCharacter = OwnerController ? Cast<AShooterCharacter>(OwnerController->GetCharacter()) : NULL;
-	if (ShooterCharacter != NULL)
-	{
-		ShooterCharacter->Suicide();
+		AShooterGameMode_TeamDeathMatch* GMTDM = Cast<AShooterGameMode_TeamDeathMatch>(GetWorld()->GetAuthGameMode());
+		AShooterAIController* BotController = Cast<AShooterAIController>(GetOwner());
+		if (GMTDM && !BotController)
+		{
+			GMTDM->PlayerChangedToTeam(this, NewTeamNumber);
+		}
+		AController* OwnerController = Cast<AController>(GetOwner());
+		AShooterCharacter* ShooterCharacter = OwnerController ? Cast<AShooterCharacter>(OwnerController->GetCharacter()) : NULL;
+		if (ShooterCharacter != NULL)
+		{
+			ShooterCharacter->Suicide();
+		}
 	}
 }
 
@@ -144,9 +147,12 @@ void AShooterPlayerState::ServerSetColor_Implementation(uint8 ColorIndex, FLinea
 	AShooterGameState* const MyGameState = GetWorld()->GetGameState<AShooterGameState>();
 	if (MyGameState && MyGameState->bChangeToTeamColors)
 	{
-		TheColor = GTeamColors[GetTeamNum()];
+		UShooterGameInstance* GI = GetWorld()->GetGameInstance<UShooterGameInstance>();
+		if (GI)
+		{
+			TheColor = GI->GetTeamColor(GetTeamNum());
+		}
 	}
-	check(ColorIndex < GetNumColors());
 	PlayerColors[ColorIndex] = NewColor;
 	AController* OwnerController = Cast<AController>(GetOwner());
 	AShooterCharacter* ShooterCharacter = OwnerController ? Cast<AShooterCharacter>(OwnerController->GetCharacter()) : NULL;
@@ -159,12 +165,8 @@ void AShooterPlayerState::ServerSetColor_Implementation(uint8 ColorIndex, FLinea
 // server -> server+clients
 void AShooterPlayerState::BroadcastNewColor_Implementation(uint8 ColorIndex, FLinearColor NewColor, AShooterCharacter* OwnerCharacter)
 {
-	check(ColorIndex < GetNumColors());
 	PlayerColors[ColorIndex] = NewColor;
-	if (OwnerCharacter)
-	{
-		OwnerCharacter->UpdatePlayerColorsAllMIDs();
-	}
+	OwnerCharacter->UpdatePlayerColorsAllMIDs();
 }
 
 void AShooterPlayerState::SetColorLocal(uint8 ColorIndex, FLinearColor NewColor)
@@ -183,13 +185,21 @@ void AShooterPlayerState::SetColorLocal(uint8 ColorIndex, FLinearColor NewColor)
 }
 
 
+void AShooterPlayerState::UpdateAllColors()
+{
+	for (int32 i = 0; i < PlayerColors.Num(); i++)
+	{
+		SetColorLocal(i, PlayerColors[i]);
+	}
+}
+
 FLinearColor AShooterPlayerState::GetColor(uint8 ColorIndex) const
 {
 	check(ColorIndex < PlayerColors.Num());
 	return PlayerColors[ColorIndex];
 }
 
-int32 AShooterPlayerState::GetTeamNum() const
+uint8 AShooterPlayerState::GetTeamNum() const
 {
 	return TeamNumber;
 }
@@ -336,4 +346,10 @@ void AShooterPlayerState::OnRep_LivesRemaining()
 int32 AShooterPlayerState::GetLivesRemaining() const
 {
 	return LivesRemaining;
+}
+
+
+void AShooterPlayerState::OnRep_PlayerColors()
+{
+	UpdateAllColors();
 }

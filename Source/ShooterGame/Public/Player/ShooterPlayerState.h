@@ -16,26 +16,16 @@ public:
 	AShooterPlayerState();
 
 	// Begin APlayerState interface
-	/** clear scores */
-	virtual void Reset() override;
-
-	/**
-	 * Set the team 
-	 *
-	 * @param	InController	The controller to initialize state with
-	 */
+	virtual void Reset() override; //also clear scores
 	virtual void ClientInitialize(class AController* InController) override;
 	virtual void UnregisterPlayerWithSession() override;
-
 	// End APlayerState interface
 
-	/**
-	 * Set new team and update pawn. Also updates player character team colors.
-	 *
-	 * @param	NewTeamNumber	Team we want to be on.
+	/** Set new team and update pawn. Also updates player character team colors.
+	 *  @param	NewTeamNumber	Team we want to be on.
 	 */
 	UFUNCTION(BlueprintCallable, Reliable, WithValidation, Server, Category=PlayerState)
-	void ServerSetTeamNum(int32 NewTeamNumber);
+	void ServerSetTeamNum(uint8 NewTeamNumber);
 
 	/** player killed someone */
 	UFUNCTION(BlueprintCallable, Category=PlayerState)
@@ -51,7 +41,7 @@ public:
 	
 	/** get current team */
 	UFUNCTION(BlueprintPure, Category=PlayerState)
-	int32 GetTeamNum() const;
+	uint8 GetTeamNum() const;
 
 	/** get number of kills */
 	UFUNCTION(BlueprintPure, Category=PlayerState)
@@ -86,6 +76,9 @@ public:
 
 	/** sets this player's colors, locally only */
 	void SetColorLocal(uint8 ColorIndex, FLinearColor NewColor);
+
+	/** sets all of this player's colors, locally only, reading values from PlayerColors array */
+	void UpdateAllColors();
 
 	FLinearColor GetColor(uint8 ColorIndex) const;
 	inline int32 GetNumColors() const { return PlayerColors.Num(); } 
@@ -131,9 +124,12 @@ protected:
 	int32 TeamNumber;
 	
 	/** color assigned to vector parameter Color1/2/3/etc on all character's meshes */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_PlayerColors)
 	TArray<FLinearColor> PlayerColors;
-	
+
+	UFUNCTION()
+	void OnRep_PlayerColors();
+
 	/** number of kills */
 	UPROPERTY(Transient, Replicated)
 	int32 NumKills;
@@ -152,6 +148,8 @@ protected:
 
 	/** helper for scoring points */
 	void ScorePoints(int32 Points);
+
+	FTimerHandle WaitForMatchStartHandle;
 
 	//////////////////////////////////////////
 	// Server only variables

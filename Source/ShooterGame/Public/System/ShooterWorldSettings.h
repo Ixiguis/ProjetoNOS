@@ -30,11 +30,11 @@ public:
 	
 	/** Minimum number of teams supported in this map, if it's for a team-based game mode. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameMode, Meta = (EditCondition = "bSupportsArenaGameModes"))
-	int32 MinTeams;
+	uint8 MinTeams;
 	
 	/** Maximum number of teams supported in this map, if it's for a team-based game mode. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameMode, Meta = (EditCondition = "bSupportsArenaGameModes"))
-	int32 MaxTeams;
+	uint8 MaxTeams;
 	
 #if WITH_EDITOR
 	/** writes map's metadata (MaxTeamsCTF, title, author, etc.) to a txt file on the same location as the level, for fast reading */

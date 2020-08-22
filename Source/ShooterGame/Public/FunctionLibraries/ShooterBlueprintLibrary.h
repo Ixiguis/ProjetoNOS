@@ -82,14 +82,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Collision")
 	static bool FindTeleportSpot(AActor* TestActor, FVector PlaceLocation, FRotator PlaceRotation, FVector& ResultingLocation);
 	
-	/** Returns the text associated with a team number, e.g. 0 returns localized "Red". */
-	UFUNCTION(BlueprintPure, Category = "Game")
-	static FText GetTeamColorText(int32 TeamNum);
-	
-	/** Returns the color associated with a team number, e.g. 0 returns the red team's color. -1 returns gray. */
-	UFUNCTION(BlueprintPure, Category = "Game")
-	static FLinearColor GetTeamColor(int32 TeamNum);
-	
 	/** Returns time formatted as MM:SS. */
 	UFUNCTION(BlueprintPure, Category = "Game")
 	static FText FormatTime(float TimeSeconds);

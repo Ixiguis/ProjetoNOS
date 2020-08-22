@@ -6,6 +6,7 @@
 #include "GameRules/ShooterGameState.h"
 #include "Player/ShooterCharacter.h"
 #include "Player/ShooterPlayerState.h"
+#include "ShooterGameInstance.h"
 #include "EngineUtils.h"
 
 AShooterGameMode_CTF::AShooterGameMode_CTF()
@@ -108,46 +109,50 @@ void AShooterGameMode_CTF::Score(AShooterCharacter* Scorer)
 
 void AShooterGameMode_CTF::LoadFlags()
 {
-	AShooterFlagBase* FlagBases[GMaxTeams];
-	for (uint8 i = 0; i < GMaxTeams; i++)
+	UShooterGameInstance* GI = GetWorld()->GetGameInstance<UShooterGameInstance>();
+	if (GI)
 	{
-		FlagBases[i] = NULL;
-	}
-	uint8 BasesFound = 0;
-	for (TActorIterator< AShooterFlagBase > ActorItr = TActorIterator< AShooterFlagBase >(GetWorld()); ActorItr; ++ActorItr)
-	{
-		AShooterFlagBase* FlagBase = *ActorItr;
-		check(FlagBase->TeamNumber < GMaxTeams);
-		if (FlagBases[FlagBase->TeamNumber] == NULL)
+		TArray<AShooterFlagBase*> FlagBases;
+		for (uint8 i = 0; i < GI->GetMaxTeams(); i++)
 		{
-			FlagBases[FlagBase->TeamNumber] = FlagBase;
-			BasesFound++;
+			FlagBases.Add(NULL);
 		}
-		else
+		uint8 BasesFound = 0;
+		for (TActorIterator< AShooterFlagBase > ActorItr = TActorIterator< AShooterFlagBase >(GetWorld()); ActorItr; ++ActorItr)
 		{
-			UE_LOG(LogShooterGameMode, Warning, TEXT("Flag Base %s has a TeamNumber that was already defined by another Flag Base."), *FlagBase->GetFullName());
+			AShooterFlagBase* FlagBase = *ActorItr;
+			check(FlagBase->TeamNumber < GI->GetMaxTeams());
+			if (FlagBases[FlagBase->TeamNumber] == NULL)
+			{
+				FlagBases[FlagBase->TeamNumber] = FlagBase;
+				BasesFound++;
+			}
+			else
+			{
+				UE_LOG(LogShooterGameMode, Warning, TEXT("Flag Base %s has a TeamNumber that was already defined by another Flag Base."), *FlagBase->GetFullName());
+			}
 		}
-	}
-	if (BasesFound < 2)
-	{
-		UE_LOG(LogShooterGameMode, Fatal, TEXT("Map %s has no FlagBases for CTF games (or only one, or they aren't in the persistent level). [apenas os mapas Farce e Fallout suportam CTF]"), *GetWorld()->PersistentLevel->GetFullName());
-	}
-	for (uint8 i = 0; i < ShooterGameState->GetNumTeams(); i++)
-	{
-		if (FlagBases[i] == NULL)
+		if (BasesFound < 2)
 		{
-			UE_LOG(LogShooterGameMode, Warning, TEXT("Map %s has no FlagBase defined for team %s. Reducing the team count."), *GetWorld()->PersistentLevel->GetFullName(), *FString::FromInt(i));
-			ShooterGameState->SetNumTeams(i);
-			break;
+			UE_LOG(LogShooterGameMode, Fatal, TEXT("Map %s has no FlagBases for CTF games (or only one, or they aren't in the persistent level). [apenas os mapas Farce e Fallout suportam CTF]"), *GetWorld()->PersistentLevel->GetFullName());
 		}
-		else
+		for (uint8 i = 0; i < ShooterGameState->GetNumTeams(); i++)
 		{
-			FActorSpawnParameters SpawnInfo;
-			AShooterFlag* Flag = GetWorld()->SpawnActor<AShooterFlag>(FlagBases[i]->FlagTemplate, FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
-			Flag->GetRootComponent()->AttachToComponent(FlagBases[i]->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
-			Flag->SetFlagBase(FlagBases[i]);
-			Flag->AutoReturnTime = FlagAutoReturnTime;
-			Flags.Add(Flag);
+			if (FlagBases[i] == NULL)
+			{
+				UE_LOG(LogShooterGameMode, Warning, TEXT("Map %s has no FlagBase defined for team %s. Reducing the team count."), *GetWorld()->PersistentLevel->GetFullName(), *FString::FromInt(i));
+				ShooterGameState->SetNumTeams(i);
+				break;
+			}
+			else
+			{
+				FActorSpawnParameters SpawnInfo;
+				AShooterFlag* Flag = GetWorld()->SpawnActor<AShooterFlag>(FlagBases[i]->FlagTemplate, FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
+				Flag->GetRootComponent()->AttachToComponent(FlagBases[i]->GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+				Flag->SetFlagBase(FlagBases[i]);
+				Flag->AutoReturnTime = FlagAutoReturnTime;
+				Flags.Add(Flag);
+			}
 		}
 	}
 }

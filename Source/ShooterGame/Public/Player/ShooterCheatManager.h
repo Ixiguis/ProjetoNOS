@@ -26,7 +26,7 @@ public:
 	void ForceMatchStart();
 
 	UFUNCTION(exec)
-	void ChangeTeam(int32 NewTeamNumber);
+	void ChangeTeam(uint8 NewTeamNumber);
 
 	UFUNCTION(exec)
 	void Cheat(const FString& Msg);

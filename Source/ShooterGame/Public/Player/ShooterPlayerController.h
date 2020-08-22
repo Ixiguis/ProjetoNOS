@@ -197,6 +197,11 @@ public:
 
 	// End APlayerController interface
 
+	// Begin AActor interface
+	/** save persistent user on player quit */
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	// End AActorinterface
+
 	// begin AShooterPlayerController-specific
 
 	/** 

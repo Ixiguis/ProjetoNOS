@@ -205,22 +205,19 @@ void AShooterCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
+	AShooterPlayerState* PS = GetPlayerState<AShooterPlayerState>();
 	// [client] as soon as GetPlayerState<AShooterPlayerState>() is assigned, set colors of this pawn for local player
-	if (GetPlayerState<AShooterPlayerState>() != NULL)
+	if (PS)
 	{
 		UpdatePlayerColorsAllMIDs();
-		AShooterPlayerState* PS = GetPlayerState<AShooterPlayerState>();
 		UShooterPersistentUser* PU = GetPersistentUser();
-		if (PS)
+		//PS->SetPlayerName(PU->GetPlayerName());
+		//if (PlayerColorsAreDefaults(PS))
 		{
-			//PS->SetPlayerName(PU->GetPlayerName());
-			if (PlayerColorsAreDefaults(PS))
-			{
-				//player colors may have not been replicated yet, set a timer and try again
-				GetWorldTimerManager().SetTimer(UpdatePlayerColorsAllMIDsHandle, this, &AShooterCharacter::UpdatePlayerColorsAllMIDs, 2.f, false);
-			}
-			OnPlayerStateReplicated(PS);
+			//player colors may have not been replicated yet, set a timer and try again
+			GetWorldTimerManager().SetTimer(UpdatePlayerColorsAllMIDsHandle, this, &AShooterCharacter::UpdatePlayerColorsAllMIDs, 1.f, false);
 		}
+		OnPlayerStateReplicated(PS);
 	}
 }
 

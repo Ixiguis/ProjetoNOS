@@ -27,7 +27,7 @@ AShooterAIController::AShooterAIController()
 
 void AShooterAIController::OnPossess(APawn* InPawn)
 {
-	Super::Possess(InPawn);
+	Super::OnPossess(InPawn);
 
 	AShooterCharacter* Bot = Cast<AShooterCharacter>(InPawn);
 

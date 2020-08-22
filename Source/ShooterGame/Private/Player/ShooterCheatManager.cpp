@@ -51,7 +51,7 @@ void UShooterCheatManager::ForceMatchStart()
 	}
 }
 
-void UShooterCheatManager::ChangeTeam(int32 NewTeamNumber)
+void UShooterCheatManager::ChangeTeam(uint8 NewTeamNumber)
 {
 	AShooterPlayerController* MyPC = GetOuterAShooterPlayerController();
 

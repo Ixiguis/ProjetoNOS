@@ -8,13 +8,14 @@
 #include "Player/ShooterCharacter.h"
 #include "Player/ShooterPlayerState.h"
 #include "ShooterTeamStart.h"
+#include "ShooterGameInstance.h"
 #include "AI/ShooterAIController.h"
 
 AShooterGameMode_TeamDeathMatch::AShooterGameMode_TeamDeathMatch()
 {
 	GameModeInfo.GameModeName = NSLOCTEXT("Game", "TeamDeathmatch", "Team Deathmatch");
 	GameModeInfo.MinTeams = 2;
-	GameModeInfo.MaxTeams = GMaxTeams;
+	GameModeInfo.MaxTeams = GetDefault<UShooterGameInstance>()->GetMaxTeams();
 	GameModeInfo.bAddToMenu = true;
 	GameModeInfo.bIgnoreMapTeamCountRestriction = true;
 	bDelayedStart = true;

@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Player/ShooterCharacter.h"
+#include "Components/InputComponent.h"
 
 #define MIN_ZOOM 200.f
 #define MAX_ZOOM 800.f
