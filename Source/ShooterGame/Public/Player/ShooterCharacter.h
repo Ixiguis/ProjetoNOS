@@ -17,31 +17,30 @@ class AShooterCharacter : public ACharacter
 
 public:
 
+	//Begin AActor interface
 	/** setup initial variables, spawn inventory */
 	virtual void BeginPlay() override;
-
 	/** Update the character. (Running, health etc). */
 	virtual void Tick(float DeltaSeconds) override;
-
 	/** cleanup inventory */
 	virtual void Destroyed() override;
+	//End AActor interface
 
-	/** update mesh for first person view */
-	virtual void PawnClientRestart() override;
-
-	/** [server] update pawn meshes after possession */
+	//Begin APawn interface
 	virtual void PossessedBy(class AController* C) override;
-	/** [server] update pawn meshes after unpossession */
 	virtual void UnPossessed() override;
-
-	/** [client] perform PlayerState related setup */
+	virtual void OnRep_Controller() override;
 	virtual void OnRep_PlayerState() override;
+	virtual void FaceRotation(FRotator NewRotation, float DeltaTime) override; //overriding to allow bots to aim up/down
+	virtual class AController* GetDamageInstigator(class AController* InstigatedBy, const class UDamageType& DamageType) const override;
+	virtual void PawnClientRestart() override; //update mesh for first person view
+	//End APawn interface
 	
 	/** called after a valid PlayerState is updated */
 	UFUNCTION(BlueprintImplementableEvent, Category=Pawn)
 	void OnPlayerStateReplicated(class AShooterPlayerState* NewPlayerState);
-	
-	/** called after this character was possessed by a controller */
+
+	/** called after this character was possessed by a controller. Called only on server and on (server/client) owning pawn. */
 	UFUNCTION(BlueprintImplementableEvent, Category=Pawn)
 	void OnPawnPossessed(class AController* NewController);
 
@@ -54,8 +53,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category=Camera)
 	void OnCameraUpdate(const FVector& CameraLocation, const FRotator& CameraRotation);
 
-	/** overriding to allow bots to aim up/down */
-	virtual void FaceRotation(FRotator NewRotation, float DeltaTime) override;
 
 	/** get aim offsets */
 	UFUNCTION(BlueprintCallable, Category=Aiming)
@@ -193,8 +190,6 @@ public:
 	/** Called on landing after falling has completed, to perform actions based on the Hit result. Triggers the OnLanded event. */
 	virtual void Landed(const FHitResult& Hit) override;
 
-	//virtual void SetBase(UPrimitiveComponent* NewBase, bool bNotifyActor = true) override;
-
 	UPROPERTY(EditDefaultsOnly, Category=Pawn)
 	USoundCue* JumpSound;
 	
@@ -242,11 +237,7 @@ public:
 
 	/* Frame rate independent lookup */
 	void LookUpAtRate(float Val);
-	/*
-	virtual void AddControllerYawInput(float Val) override;
 
-	virtual void AddControllerPitchInput(float Val) override;
-	*/
 	void OnStartFirePrimary();
 
 	/** player pressed start fire action */
@@ -676,8 +667,6 @@ protected:
 	
 	/** Overriding to allow ragdolls to take damage */
 	virtual bool ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
-
-	virtual class AController* GetDamageInstigator(class AController* InstigatedBy, const class UDamageType& DamageType) const override;
 
 	/** time when this character last took damage */
 	float LastHitTime;

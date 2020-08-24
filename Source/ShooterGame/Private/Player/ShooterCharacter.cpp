@@ -196,6 +196,12 @@ void AShooterCharacter::UnPossessed()
 	UpdatePawnMeshes();
 }
 
+void AShooterCharacter::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	OnPawnPossessed(GetController());
+}
+
 bool PlayerColorsAreDefaults(AShooterPlayerState* PS)
 {
 	return PS->GetColor(0) == FColor::White && PS->GetColor(1) == FColor::White && PS->GetColor(2) == FColor::White;

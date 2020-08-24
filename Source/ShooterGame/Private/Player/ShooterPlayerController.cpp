@@ -59,6 +59,7 @@ AShooterPlayerController::AShooterPlayerController()
 	ShooterFriendUpdateTimer = 0.0f;
 	bHasSentStartEvents = false;
 	NumberOfTalkers = 0;
+	bCheckForGameAndPlayerState = true;
 }
 
 void AShooterPlayerController::SetupInputComponent()
@@ -92,6 +93,14 @@ void AShooterPlayerController::TickActor(float DeltaTime, enum ELevelTick TickTy
 	if(bGameEndedFrame)
 	{
 		bGameEndedFrame = false;
+	}
+	if (bCheckForGameAndPlayerState)
+	{
+		if (GetPlayerState<APlayerState>() && GetWorld()->GetGameState())
+		{
+			OnGameAndPlayerStateReplicated();
+			bCheckForGameAndPlayerState = false;
+		}
 	}
 }
 
@@ -175,6 +184,13 @@ void AShooterPlayerController::PawnPendingDestroy(APawn* P)
 	Super::PawnPendingDestroy(P);
 
 	ClientSetSpectatorCamera(DestroyedPawn, true);
+}
+
+void AShooterPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	//called on server
+	OnPossessed(aPawn);
 }
 
 void AShooterPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIsWinner)
@@ -565,6 +581,7 @@ void AShooterPlayerController::CleanupSessionOnReturnToMenu()
 void AShooterPlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
+	//called on clients
 	OnPlayerStateReplicated();
 }
 
@@ -991,6 +1008,8 @@ void AShooterPlayerController::SetPlayerName(const FString& NewName)
 void AShooterPlayerController::InitPlayerState()
 {
 	Super::InitPlayerState();
+	//called on server
+	OnPlayerStateReplicated();
 }
 
 bool AShooterPlayerController::IsEnemyFor(AController* TestPC) const
@@ -1067,14 +1086,13 @@ void AShooterPlayerController::UpdateChatOption()
 void AShooterPlayerController::ReceivedGameModeClass(TSubclassOf<class AGameModeBase> GameModeClass)
 {
 	Super::ReceivedGameModeClass(GameModeClass);
-	//this is called on clients only
-	GameModeAndStateInitialized();
 }
 
 void AShooterPlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
-	Possessed(P);
+	//called on owning client
+	OnPossessed(P);
 }
 
 void AShooterPlayerController::SetSoundClassVolume(FString ClassName, float NewVolume)

@@ -266,13 +266,13 @@ public:
 
 	/** [server+client] Called after the gamemode and gamestate are initialized. */
 	UFUNCTION(BlueprintImplementableEvent, Category = Controller)
-	void GameModeAndStateInitialized();
+	void OnGameAndPlayerStateReplicated();
 
 	virtual void AcknowledgePossession(class APawn* P) override;
 
 	/** [server+client] Called when the controller possesses a new pawn. Unlike AController::ReceivePossess, this is called on clients too. */
 	UFUNCTION(BlueprintImplementableEvent, Category = Controller)
-	void Possessed(class APawn* NewPawn);
+	void OnPossessed(class APawn* NewPawn);
 
 	/** Called when the weapon has run SetCrosshair() */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Controller")
@@ -339,6 +339,9 @@ protected:
 	/** update camera when pawn dies */
 	virtual void PawnPendingDestroy(APawn* P) override;
 
+	/** call our OnPossessed event */
+	virtual void OnPossess(APawn* aPawn) override;
+
 	//End AController interface
 
 	// Begin APlayerController interface
@@ -391,4 +394,6 @@ protected:
 
 	void AddLocalPlayer();
 	void RemoveLocalPlayer();
+
+	bool bCheckForGameAndPlayerState;
 };
